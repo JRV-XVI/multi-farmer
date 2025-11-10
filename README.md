@@ -7,8 +7,9 @@
 | [Jonathan Roman Velasco] | [Ej. Programación en Python, liderazgo, comunicación] | [Ej. Organización del tiempo] | [Ej. Mejorar en trabajo en equipo] |
 | [Mario Feng Wu] | [Ej. Diseño 3D, documentación técnica] | [Ej. Conocimientos de IA] | [Ej. Aprender sobre arquitecturas de agentes] |
 | [Luis Fernando Valderrabano] | [...] | [...] | [...] |
-| [Octavio Sebastián Hernández Galindo] | [...] | [...] |
+| [Octavio Sebastián Hernández Galindo] | [...] | [...] | [...] |
 | [Ángel Gabriel Camacho Pérez] | [...] | [...] | [...] |
+| [José Pedro Gastélum Beltrán] | [...] | [...] | [...] |
 
 ### 💪 Expectativas del Equipo
 - [Ej. Desarrollar un sistema funcional con agentes colaborativos.]  
