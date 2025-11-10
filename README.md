@@ -6,7 +6,7 @@
 |-------------|-------------|----------------------|------------------------------------|
 | [Jonathan Roman Velasco] | [Ej. Programación en Python, liderazgo, comunicación] | [Ej. Organización del tiempo] | [Ej. Mejorar en trabajo en equipo] |
 | [Mario Feng Wu] | [Ej. Diseño 3D, documentación técnica] | [Ej. Conocimientos de IA] | [Ej. Aprender sobre arquitecturas de agentes] |
-| [Luis Fernando Valderrabano] | [...] | [...] | [...] |
+| [Luis Fernando Valderrabano] | [Ej. Ciberseguridad, Python, Linux] | [Ej. Organización de tareas, seguridad] | [Aprender funcionamiento y arquitectura de agentes para ciberseguridad o pentesting] |
 | [Octavio Sebastián Hernández Galindo] | [...] | [...] | [...] |
 | [Ángel Gabriel Camacho Pérez] | [...] | [...] | [...] |
 | [José Pedro Gastélum Beltrán] | [...] | [...] | [...] |
