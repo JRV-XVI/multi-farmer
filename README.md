@@ -4,12 +4,12 @@
 
 | Integrante | Fortalezas | Áreas de oportunidad | Expectativas personales del bloque |
 |-------------|-------------|----------------------|------------------------------------|
-| Jonathan Roman Velasco | Implementacion de algoritmos, C++, Linux, Control de versionnes de Git, Liderazgo | Uso de Unity, Conocimientos de entrenamiento de agentes | Entender los sistemas autonomos, Mejorar el uso de sistemas de control de Git en proyectos mas grandes |
-| [Mario Feng Wu] | [Ej. Diseño 3D, documentación técnica] | [Ej. Conocimientos de IA] | [Ej. Aprender sobre arquitecturas de agentes] |
-| [Luis Fernando Valderrabano] | [Ej. Ciberseguridad, Python, Linux] | [Ej. Organización de tareas, seguridad] | [Aprender funcionamiento y arquitectura de agentes para ciberseguridad o pentesting] |
-| [Octavio Sebastián Hernández Galindo] | [...] | [...] | [...] |
-| [Ángel Gabriel Camacho Pérez] | [...] | [...] | [...] |
-| [José Pedro Gastélum Beltrán] | [...] | [...] | [...] |
+| Jonathan Roman Velasco | Implementacion de algoritmos, C++, Linux, Control de versiones de Git, Liderazgo | Uso de Unity, Conocimientos de entrenamiento de agentes | Entender los sistemas autonomos, Mejorar el uso de sistemas de control de Git en proyectos mas grandes |
+| Mario Feng Wu | [Ej. Diseño 3D, documentación técnica] | [Ej. Conocimientos de IA] | [Ej. Aprender sobre arquitecturas de agentes] |
+| Luis Fernando Valderrabano | Ciberseguridad, Python, Linux | Organización de tareas, seguridad | Aprender funcionamiento y arquitectura de agentes para ciberseguridad o pentesting |
+| Octavio Sebastián Hernández Galindo | Uso de Unity, Python, C++, Git & GitHub, Documentación | Conocimiento teórico y práctico de agentes, bases de IA | Recibir bases sólidas sobre sistemas de IA y expandir conocimiento de Unity y C# |
+| Ángel Gabriel Camacho Pérez | [...] | [...] | [...] |
+| José Pedro Gastélum Beltrán | [...] | [...] | [...] |
 
 ### 💪 Expectativas del Equipo
 - Desarrollar un sistema funcional con agentes colaborativos.
