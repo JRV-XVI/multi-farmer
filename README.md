@@ -9,7 +9,7 @@
 | Luis Fernando Valderrabano | Ciberseguridad, Python, Linux | Organización de tareas, seguridad | Aprender funcionamiento y arquitectura de agentes para ciberseguridad o pentesting |
 | Octavio Sebastián Hernández Galindo | Uso de Unity, Python, C++, Git & GitHub, Documentación | Conocimiento teórico y práctico de agentes, bases de IA | Recibir bases sólidas sobre sistemas de IA y expandir conocimiento de Unity y C# |
 | Ángel Gabriel Camacho Pérez | [...] | [...] | [...] |
-| José Pedro Gastélum Beltrán | Unity, C++, Git t Github, Python | Profundizar en entrenamiento y comportamiento de agentes, mejorar optimización de algoritmos en entornos complejos | Comprender el funcionamiento de agentes y emplearlos para automatización, adquirir conocimientos de Unity y C# |
+| José Pedro Gastélum Beltrán | Unity, C++, Git y Github, Python | Profundizar en entrenamiento y comportamiento de agentes, mejorar optimización de algoritmos en entornos complejos | Comprender el funcionamiento de agentes y emplearlos para automatización, adquirir conocimientos de Unity y C# |
 
 ### 💪 Expectativas del Equipo
 - Desarrollar un sistema funcional con agentes colaborativos.
