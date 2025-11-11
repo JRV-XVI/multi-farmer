@@ -4,7 +4,7 @@
 
 | Integrante | Fortalezas | Áreas de oportunidad | Expectativas personales del bloque |
 |-------------|-------------|----------------------|------------------------------------|
-| Jonathan Roman Velasco | Implementacion de algoritmos, C++, Linux, Control de versiones de Git, Liderazgo | Uso de Unity, Conocimientos de entrenamiento de agentes | Entender los sistemas autonomos, Mejorar el uso de sistemas de control de Git en proyectos mas grandes |
+| Jonathan Roman Velasco | Implementacion de algoritmos, C++, Linux, Control de versiones de Git, Liderazgo | Conocimientos de entrenamiento de agentes | Entender los sistemas autonomos, Mejorar el uso de sistemas de control de Git en proyectos mas grandes |
 | Mario Feng Wu | Uso de Unity, Python, Organización de timepos y tareas, Análisis de datos, Machine Learning | Conocimiento de agentes para automatización de tareas | Comprender el funcionamiento de un agente y emplearlo en un caso cotidiano, así mismo expandir el uso de Unity y C# |
 | Luis Fernando Valderrabano | Ciberseguridad, Python, Linux, Servidores, Redes | Organización de tareas, seguridad en la aplicación que se realice | Aprender funcionamiento y arquitectura de agentes para ciberseguridad o pentesting |
 | Octavio Sebastián Hernández Galindo | Uso de Unity, Python, C++, Git & GitHub, Documentación | Conocimiento teórico y práctico de agentes, bases de IA | Recibir bases sólidas sobre sistemas de IA y expandir conocimiento de Unity y C# |
