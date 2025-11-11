@@ -4,82 +4,120 @@
 
 | Integrante | Fortalezas | Áreas de oportunidad | Expectativas personales del bloque |
 |-------------|-------------|----------------------|------------------------------------|
-| Jonathan Roman Velasco | Implementacion de algoritmos, C++, Linux, Control de versionnes de Git, Liderazgo | Uso de Unity, Conocimientos de entrenamiento de agentes | Entender los sistemas autonomos, Mejorar el uso de sistemas de control de Git en proyectos mas grandes |
-| [Mario Feng Wu] | [Ej. Diseño 3D, documentación técnica] | [Ej. Conocimientos de IA] | [Ej. Aprender sobre arquitecturas de agentes] |
-| [Luis Fernando Valderrabano] | [...] | [...] | [...] |
-| [Octavio Sebastián Hernández Galindo] | [...] | [...] | [...] |
-| [Ángel Gabriel Camacho Pérez] | [...] | [...] | [...] |
-| [José Pedro Gastélum Beltrán] | [...] | [...] | [...] |
+| Jonathan Roman Velasco | Implementacion de algoritmos, C++, Linux, Control de versiones de Git, Liderazgo | Uso de Unity, Conocimientos de entrenamiento de agentes | Entender los sistemas autonomos, Mejorar el uso de sistemas de control de Git en proyectos mas grandes |
+| Mario Feng Wu | Uso de Unity, Python, Organización de timepos y tareas, Análisis de datos, Machine Learning | Conocimiento de agentes para automatización de tareas | Comprender el funcionamiento de un agente y emplearlo en un caso cotidiano, así mismo expandir el uso de Unity y C# |
+| Luis Fernando Valderrabano | Ciberseguridad, Python, Linux, Servidores, Redes | Organización de tareas, seguridad en la aplicación que se realice | Aprender funcionamiento y arquitectura de agentes para ciberseguridad o pentesting |
+| Octavio Sebastián Hernández Galindo | Uso de Unity, Python, C++, Git & GitHub, Documentación | Conocimiento teórico y práctico de agentes, bases de IA | Recibir bases sólidas sobre sistemas de IA y expandir conocimiento de Unity y C# |
+| Ángel Gabriel Camacho Pérez | Uso de Unity, C++, diseño OO, Github, algoritmos | Ciberseguridad, Python, Machine Learning | Espero mejorar mis conocimientos de Unity, aplicar algoritmos aprendidos en clase y aprender a modelar en 3D. |
+| José Pedro Gastélum Beltrán | Unity, C++, Git y Github, Python | Profundizar en entrenamiento y comportamiento de agentes, mejorar optimización de algoritmos en entornos complejos | Comprender el funcionamiento de agentes y emplearlos para automatización, adquirir conocimientos de Unity y C# |
 
-### 💪 Expectativas del Equipo
+## 💪 Expectativas del Equipo
 - Desarrollar un sistema funcional con agentes colaborativos.
-- Fortalecer nuestras habilidades en planificación y trabajo ágil.
-- Mantener una comunicación constante y efectiva.
+- Fortalecer habilidades de planificación y trabajo ágil.
+- Mantener comunicación constante.
+- Profundizar en agentes con aplicación profesional.
 
-### 🤝 Compromisos del Equipo
-- Cumplir con los tiempos establecidos en el plan de trabajo.  
-- Documentar correctamente cada avance.  
-- Apoyar a los compañeros en tareas críticas o retrasadas.
+## 🤝 Compromisos del Equipo
+- Cumplir tiempos del plan de trabajo.  
+- Documentar avances.  
+- Apoyo entre compañeros.  
+- Respeto y enfoque.
 
 ---
 
-## 🧰 Creación de Herramientas de Trabajo Colaborativo
-- **Repositorio en GitHub:** https://github.com/JRV-XVI/multi-farmer
-- **Herramienta de comunicación:** Discord / Whatsapp
+## 🧰 Herramientas Colaborativas
+- **Repositorio:** https://github.com/JRV-XVI/multi-farmer  
+- **Comunicación:** Discord / WhatsApp  
 - **Gestión de tareas:** Trello / GitHub Projects  
-- **Control de versiones:** Git (flujo de ramas: `main`, `develop`, `feature/*`)
+- **Control de versiones:** Git con flujo `main` → `develop` → `feature/usuario`
 
 ---
 
-## 🚀 Descripción del Reto a Desarrollar
+# 🚀 Reto del Proyecto
 
-Los cultivos agrícolas representan cerca del 80% de la dieta humana. En México, frutos de alta rotación como la fresa o el pepino deben cosecharse en ventanas cortas para preservar su valor comercial.  
-Actualmente, la detección de plagas y enfermedades depende de inspecciones visuales tardías, generando pérdidas de hasta 40% de la producción mundial (FAO, 2022).  
+Los cultivos agrícolas dependen de detección temprana de plagas y enfermedades. El virus **Rugoso del Tomate** afecta cultivos como tomate y pimiento, propagándose rápidamente y causando pérdidas críticas.
 
-### 🌱 Problema específico
-En cultivos como tomate o pimiento, el virus **Rugoso del Tomate** se propaga rápidamente mediante el contacto con herramientas o manos contaminadas. Los síntomas son tardíos y difíciles de identificar visualmente, lo que provoca la eliminación masiva de plantas.
+## 🌱 Problema
+Los síntomas aparecen tarde y son difíciles de identificar, generando eliminación masiva de plantas.
 
-### 💡 Solución propuesta
-Desarrollar un **sistema multiagente autónomo** capaz de:
-1. Monitorear continuamente las plantas dentro de un invernadero mediante robots móviles.  
-2. Detectar tempranamente signos de estrés o enfermedad mediante visión por computadora y sensores multiespectrales.  
-3. Transmitir los datos a un agente deliberativo de decisión que determine acciones de manejo.  
-4. Notificar automáticamente al agente humano responsable sobre las medidas a ejecutar (eliminación o tratamiento localizado).
-
-**Objetivo general:**  
-Mejorar la eficiencia de detección y respuesta ante anomalías en cultivos agrícolas, reduciendo pérdidas y uso innecesario de recursos.
+## 💡 Solución Propuesta
+Un **sistema multiagente autónomo** que:
+1. Monitorea continuamente plantas.
+2. Detecta signos de estrés o enfermedad.
+3. Clasifica anomalías con IA.
+4. Decide acciones: tratamiento, purga o intervención humana.
+5. Coordina agentes para ejecución eficiente.
 
 ---
 
-## 🧩 Identificación de los Agentes Involucrados
+# 🧩 Refactorización de Agentes
 
-| Agente | Rol / Función | Tipo de arquitectura | Descripción breve |
-|---------|----------------|----------------------|-------------------|
-| Agente de Monitoreo (Robot Móvil) | Recorre el invernadero capturando imágenes y datos espectrales | **Reactivo** | Detecta estímulos del entorno y reacciona para recolectar información y evitar obstáculos. |
-| Agente de Análisis (IA de Diagnóstico) | Procesa la información visual para detectar anomalías | **Deliberativo** | Usa redes neuronales para identificar patrones y toma decisiones basadas en creencias y metas. |
-| Agente Coordinador (Supervisor Híbrido) | Coordina a los agentes y comunica las acciones al humano | **Híbrido** | Combina reacción inmediata ante alertas y planificación deliberativa para distribuir tareas. |
-| Agente Humano (Operario) | Recibe notificaciones y ejecuta acciones físicas | — | Representa la interacción humano-sistema y valida decisiones. |
+## 🔹 Agente Explorador (Híbrido)
+
+**Rol principal:**  
+Recorre el huerto analizando plantas para identificar posibles enfermedades.
+
+**Responsabilidades:**  
+- Analizar plantas con visión y sensores.  
+- Registrar coordenadas exactas de plantas enfermas.  
+- Calcular nivel de severidad inicial (índice espectral / modelo IA).  
+- Enviar reporte estructurado al Agente Coordinador.  
+
+**Arquitectura:**  
+- Reactivo para navegación (evitar obstáculos, patrullaje).  
+- Deliberativo para interpretación de imágenes y estimación de severidad.  
 
 ---
 
-## 🧱 Componentes Arquitectónicos
+## 🔹 Agente Recolector (Reactivo)
 
-### 🔹 Agente Reactivo (Robot de Monitoreo)
-- **Capas:**
-  - **Percepción:** Captura imágenes y señales espectrales.  
-  - **Procesamiento:** Filtra datos y detecta cambios relevantes.  
-  - **Acción:** Se desplaza y ajusta posición para nueva observación.
-- **Comportamiento:** Reacciona ante variaciones de luz, color o textura.
+**Rol principal:**  
+Recolecta toda la fruta sana siguiendo un camino eficiente.
 
-### 🔹 Agente Deliberativo (Análisis por IA)
-- **Creencias (B):** Base de datos de imágenes y patrones de enfermedades.  
-- **Deseos (D):** Mantener cultivos saludables y reducir infecciones.  
-- **Intenciones (I):** Clasificar anomalías y enviar alertas oportunas al supervisor.  
+**Responsabilidades:**  
+- Recibir lista de coordenadas de plantas sanas.  
+- Generar ruta optimizada (heurística TSP / distancia mínima).  
+- Navegar evitando obstáculos.  
+- Recolectar frutos y llevarlos al punto de acopio.  
 
-### 🔹 Agente Híbrido (Coordinador)
-- **Capas Reactivas:** Responde a alertas de anomalía en tiempo real.  
-- **Componentes BDI:** Planifica la asignación de tareas y analiza la severidad del problema.  
-- **Integración:** Combina reactividad (alertas) y deliberación (gestión de acciones globales).
+**Arquitectura:**  
+- Reactivo puro: comportamiento basado en estímulos y prioridades.  
+
+---
+
+## 🔹 Agente Purgador (Reactivo)
+
+**Rol principal:**  
+Eliminar plantas enfermas y desechar residuos de manera controlada.
+
+**Responsabilidades:**  
+- Recibir todas las coordenadas de plantas enfermas.  
+- Optimizar ruta para eliminación eficiente.  
+- Realizar proceso de purga: eliminar planta → embolsado → transporte.  
+- Llevar restos al basurero asignado.  
+
+**Arquitectura:**  
+- Reactivo puro con alta prioridad de seguridad.  
+
+---
+
+# 🧱 Componentes Arquitectónicos
+
+### Agente Reactivo (Explorador — nivel reactivo)
+- Evitar obstáculos.
+- Captura de datos ante estímulos espectrales.
+- Corrección de posición para mejor lectura.
+- Patrullaje controlado.
+
+### Agente Deliberativo (Análisis IA)
+- Procesamiento de imágenes.
+- Clasificación de anomalías.
+- Generación de alertas.
+
+### Agente Coordinador
+- Mezcla BDI + reactividad.
+- Distribución de tareas entre agentes.
+- Supervisión y comunicación con operario humano.
 
 ---
 
@@ -87,12 +125,7 @@ Mejorar la eficiencia de detección y respuesta ante anomalías en cultivos agr�
 
 ### 📌 Actividades Pendientes
 
-| Actividad | Descripción | Fecha estimada | Responsable | Estado | Esfuerzo estimado |
-|------------|-------------|----------------|--------------|---------|--------------------|
-| Revisión bibliográfica sobre virus y plagas | Investigación de fuentes académicas | 18/11/2025 | [Nombre 1] | Pendiente | 5 h |
-| Definición de agentes y arquitectura general | Diseño de roles y relaciones | 20/11/2025 | [Nombre 2] | Pendiente | 4 h |
-| Creación del entorno de simulación 3D | Modelado del invernadero y los robots | 25/11/2025 | [Nombre 3] | Pendiente | 6 h |
-| Entrenamiento preliminar de modelo de detección | Prueba con dataset de hojas infectadas | 02/12/2025 | [Nombre 1] | Pendiente | 8 h |
+[Tablero del Proyecto en GitHub](https://github.com/JRV-XVI/multi-farmer/projects)
 
 ### 🧾 Actividades para la Primera Revisión
 
@@ -104,27 +137,9 @@ Mejorar la eficiencia de detección y respuesta ante anomalías en cultivos agr�
 
 ---
 
-## 📚 Aprendizaje Adquirido
+## 📚 Aprendizaje Adquirido Del Equipo
 
-| Integrante | Aprendizaje adquirido en esta etapa |
-|-------------|------------------------------------|
-| [Nombre 1] | Comprendí cómo combinar IA con sistemas multiagente para la toma de decisiones en entornos agrícolas. |
-| [Nombre 2] | Aprendí a diseñar arquitecturas híbridas que integran planificación y reacción en tiempo real. |
-| [Nombre 3] | Fortalecí habilidades en organización de proyectos y documentación colaborativa. |
-
----
-
-## 🎨 Consistencia Gráfica
-
-- **Tipografía:** Roboto / Open Sans  
-- **Colores base:**  
-  - Primario: `#4CAF50` (verde agrícola)  
-  - Secundario: `#FFC107` (amarillo alerta)  
-  - Fondo: `#F9F9F9`  
-- **Estilo visual:**  
-  - Imágenes y diagramas centrados.  
-  - Márgenes uniformes (1.5 cm).  
-  - Iconografía simple (semillas, robots, alertas).  
+En esta etapa pudimos realizar con éxito el aterrizaje del reto para poder organizar en tiempo y forma las siguientes actividades para lograr con éxito a la solución del problema planteado. De igual forma empezar a documnetar con la herramienta Markdown y mantener un formato limpio y con buena estructura.
 
 ---
 
