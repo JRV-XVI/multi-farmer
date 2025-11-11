@@ -129,20 +129,6 @@ En esta etapa pudimos realizar con éxito el aterrizaje del reto para poder orga
 
 ---
 
-## 🎨 Consistencia Gráfica
-
-- **Tipografía:** Roboto / Open Sans  
-- **Colores base:**  
-  - Primario: `#4CAF50` (verde agrícola)  
-  - Secundario: `#FFC107` (amarillo alerta)  
-  - Fondo: `#F9F9F9`  
-- **Estilo visual:**  
-  - Imágenes y diagramas centrados.  
-  - Márgenes uniformes (1.5 cm).  
-  - Iconografía simple (semillas, robots, alertas).  
-
----
-
 📅 **Versión del documento:** v1.0  
 ✏️ **Última actualización:** 10/11/2025  
 👨‍💻 **Equipo:** Nightgaunts
