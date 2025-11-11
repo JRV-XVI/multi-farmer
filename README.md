@@ -28,8 +28,8 @@
 ## 🧰 Creación de Herramientas de Trabajo Colaborativo
 - **Repositorio en GitHub:** https://github.com/JRV-XVI/multi-farmer
 - **Herramienta de comunicación:** Discord / Whatsapp
-- **Gestión de tareas:** Trello / GitHub Projects  
-- **Control de versiones:** Git (flujo de ramas: `main`, `develop`, `usuario/feature`)
+- **Gestión de tareas:** GitHub Projects  
+- **Control de versiones:** Git (flujo de ramas: `main`, `develop`, `<user>/*feature`)
 
 ---
 
@@ -58,63 +58,74 @@ Mejorar la eficiencia de detección y respuesta ante anomalías en cultivos agr�
 
 | Agente | Rol / Función | Tipo de arquitectura | Descripción breve |
 |---------|----------------|----------------------|-------------------|
-| Agente de Exploración (Robot Móvil) | Recorre el invernadero capturando imágenes y datos espectrales | **Reactivo** | Detecta estímulos del entorno y reacciona para recolectar información y evitar obstáculos. |
-| Agente de Análisis (IA de Diagnóstico) | Procesa la información visual para detectar anomalías | **Deliberativo** | Usa redes neuronales para identificar patrones y toma decisiones basadas en creencias y metas. |
-| Agente Coordinador (Supervisor Híbrido) | Coordina a los agentes y comunica las acciones al humano | **Híbrido** | Combina reacción inmediata ante alertas y planificación deliberativa para distribuir tareas. |
-| Agente Humano (Operario) | Recibe notificaciones y ejecuta acciones físicas | — | Representa la interacción humano-sistema y valida decisiones. |
+| **Agente Explorador** | Recorre el huerto analizando plantas para identificar posibles enfermedades. | **Híbrido** | Combina navegación reactiva con análisis deliberativo mediante visión e IA para detectar y reportar plantas enfermas. |
+| **Agente Recolector** | Recolecta la fruta sana siguiendo una ruta eficiente. | **Reactivo** | Opera mediante estímulos y respuestas, optimizando su trayecto y evitando obstáculos mientras recolecta los frutos. |
+| **Agente Purgador** | Elimina plantas enfermas y desecha residuos de manera controlada. | **Reactivo** | Utiliza una arquitectura de respuesta directa con prioridad de seguridad para realizar procesos de purga y transporte de desechos. |
 
 ---
 
 ## 🧱 Componentes Arquitectónicos
 
-### 🔹 Agente Reactivo (Explorador)
+### 🔹 Agente Híbrido (Explorador)
+
+**Capas Reactivas:**
+- **Layer 0: Evitar Obstáculos**  
+  `IF DistanciaObstaculoFrontal() < 1m THEN Detener() AND Girar(ángulo) AND Avanzar()`
+
+- **Layer 1: Patrullaje del Huerto**  
+  `IF NO DetectaPlanta() THEN Vagar() AND BuscarNuevaPlanta()`
+
+- **Layer 2: Análisis de Planta**  
+  `IF DetectaPlanta() THEN CapturarImagen() AND AnalizarSeveridad() AND RegistrarCoordenadas()`
+
+**Componentes Deliberativos (BDI):**
+- **Creencias (B):** Estado actual del terreno, coordenadas de plantas enfermas, historial de análisis previos.  
+- **Deseos (D):** Identificar y reportar todas las plantas con signos de enfermedad.  
+- **Intenciones (I):** Procesar imágenes, estimar severidad y enviar reporte estructurado.  
+
+**Integración:**  
+Combina una capa reactiva para desplazamiento y evasión con una capa deliberativa para interpretación visual y generación de reportes automáticos.
+
+---
+
+### 🔹 Agente Reactivo (Recolector)
+
 **Capas:**
 - **Layer 0: Evitar Obstáculos**  
-   IF DetectaObstaculoFrontal() AND DistanciaObstaculo() <= 1m  
-   THEN Detener() AND Girar(ángulo) AND Avanzar()
+  `IF DistanciaObstaculoFrontal() < 1m THEN Detener() AND Girar(ángulo) AND Avanzar()`
 
-- **Layer 1: Recolectar Datos Críticos (Alta prioridad sensorial)**  
-   IF CambiosEspectralesSignificativos() OR VariaciónLuzBrusca() OR DetectaPlaga()  
-   THEN AjustarPosición() AND CapturarImagen() AND RegistrarEspectro()
+- **Layer 1: Navegación hacia Planta Sana**  
+  `IF RecibioCoordenada() THEN CalcularRutaOptima() AND AvanzarRuta()`
 
-- **Layer 2: Recolectar Datos Regulares**  
-   IF TiempoDesdeÚltimaCaptura() > t AND NO DetectaAnomalía()  
-   THEN CapturarImagen() AND RegistrarEspectro()
+- **Layer 2: Recolección de Fruta**  
+  `IF LlegóAPlanta() AND DetectaFrutoSano() THEN RecolectarFruta() AND TransportarAlAcopio()`
 
-- **Layer 3: Reubicar para Mejor Observación**  
-   IF ImagenDifusa() OR SeñalEspectralDébil()  
-   THEN Reposicionar() AND ReintentarCaptura()
+**Descripción general:**  
+Su comportamiento se basa en estímulo-respuesta con una prioridad en eficiencia de movimiento, sin planificación compleja.  
+Aplica heurísticas locales para minimizar tiempo de recolección y consumo energético.
 
-- **Layer 4: Patrullaje / Vagar Controlado**  
-   IF NO DetectaObstaculos() AND NO DetectaAnomalías()  
-   THEN AvanzarRuta()  
-   ELSE AjustarTrayectoria()
+---
 
-### 🔹 Agente Deliberativo (Análisis por IA)
-- **Creencias (B):** Base de datos de imágenes y patrones de enfermedades.  
-- **Deseos (D):** Mantener cultivos saludables y reducir infecciones.  
-- **Intenciones (I):** Clasificar anomalías y enviar alertas oportunas al supervisor.  
+### 🔹 Agente Reactivo (Purgador)
 
-### 🔹 Agente Híbrido (Coordinador)
-- **Capas Reactivas:** Responde a alertas de anomalía en tiempo real.  
-- **Componentes BDI:** Planifica la asignación de tareas y analiza la severidad del problema.  
-- **Integración:** Combina reactividad (alertas) y deliberación (gestión de acciones globales).
+**Capas:**
+- **Layer 0: Evitar Obstáculos**  
+  `IF DistanciaObstaculoFrontal() < 1m THEN Detener() AND Girar(ángulo) AND Avanzar()`
+
+- **Layer 1: Navegación hacia Planta Enferma**  
+  `IF RecibioCoordenada() THEN CalcularRutaSegura() AND AvanzarRuta()`
+
+- **Layer 2: Purga y Eliminación**  
+  `IF LlegóAPlanta() AND ConfirmadaComoEnferma() THEN EliminarPlanta() AND EmbolsarResiduos() AND TransportarABasurero()`
+
+**Descripción general:**  
+Funciona bajo una arquitectura **reactiva con alta prioridad de seguridad**, garantizando que las acciones de eliminación y transporte de residuos se realicen sin interferir con los demás agentes ni comprometer el entorno.
 
 ---
 
 ## 📅 Plan de Trabajo
 
-### 📌 Actividades Pendientes
-
 [Tablero del Proyecto en GitHub](https://github.com/JRV-XVI/multi-farmer/projects)
-
-### 🧾 Actividades para la Primera Revisión
-
-| Actividad | Responsable | Fecha de realización | Intervalo de esfuerzo |
-|------------|-------------|-----------------------|-----------------------|
-| Definición formal de la arquitectura multiagente | [Nombre 2] | 20/11/2025 | 3–5 h |
-| Creación del repositorio y estructura de carpetas | [Nombre 3] | 18/11/2025 | 2–3 h |
-| Redacción de la propuesta y descripción de agentes | [Nombre 1] | 22/11/2025 | 4–6 h |
 
 ---
 
