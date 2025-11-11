@@ -121,21 +121,28 @@ Eliminar plantas enfermas y desechar residuos de manera controlada.
 
 ---
 
-# 📅 Plan de Trabajo — Primera Iteración
+## 📅 Plan de Trabajo
 
-| Actividad | Responsable | Fecha | Tiempo |
-|------------|-------------|--------|---------|
-| Definición formal de arquitectura | Pendiente | 20/11/2025 | 3–5 h |
-| Creación estructura del repositorio | Pendiente | 18/11/2025 | 2–3 h |
-| Redacción propuesta y descripción de agentes | Pendiente | 22/11/2025 | 4–6 h |
+### 📌 Actividades Pendientes
+
+[Tablero del Proyecto en GitHub](https://github.com/JRV-XVI/multi-farmer/projects)
+
+### 🧾 Actividades para la Primera Revisión
+
+| Actividad | Responsable | Fecha de realización | Intervalo de esfuerzo |
+|------------|-------------|-----------------------|-----------------------|
+| Definición formal de la arquitectura multiagente | [Nombre 2] | 20/11/2025 | 3–5 h |
+| Creación del repositorio y estructura de carpetas | [Nombre 3] | 18/11/2025 | 2–3 h |
+| Redacción de la propuesta y descripción de agentes | [Nombre 1] | 22/11/2025 | 4–6 h |
 
 ---
 
-# 📚 Aprendizajes del Equipo
-Se definió el reto, se documentó con Markdown y se estructuró un plan inicial.
+## 📚 Aprendizaje Adquirido Del Equipo
+
+En esta etapa pudimos realizar con éxito el aterrizaje del reto para poder organizar en tiempo y forma las siguientes actividades para lograr con éxito a la solución del problema planteado. De igual forma empezar a documnetar con la herramienta Markdown y mantener un formato limpio y con buena estructura.
 
 ---
 
-📅 Versión del documento: **v1.1**  
-✏️ Última actualización: **10/11/2025**  
-👨‍💻 Equipo: **Nightgaunts**
+📅 **Versión del documento:** v1.0  
+✏️ **Última actualización:** 10/11/2025  
+👨‍💻 **Equipo:** Nightgaunts
