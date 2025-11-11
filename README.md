@@ -11,119 +11,131 @@
 | Ángel Gabriel Camacho Pérez | Uso de Unity, C++, diseño OO, Github, algoritmos | Ciberseguridad, Python, Machine Learning | Espero mejorar mis conocimientos de Unity, aplicar algoritmos aprendidos en clase y aprender a modelar en 3D. |
 | José Pedro Gastélum Beltrán | Unity, C++, Git y Github, Python | Profundizar en entrenamiento y comportamiento de agentes, mejorar optimización de algoritmos en entornos complejos | Comprender el funcionamiento de agentes y emplearlos para automatización, adquirir conocimientos de Unity y C# |
 
-### 💪 Expectativas del Equipo
+## 💪 Expectativas del Equipo
 - Desarrollar un sistema funcional con agentes colaborativos.
-- Fortalecer nuestras habilidades en planificación y trabajo de manera ágil.
-- Mantener una comunicación constante y efectiva.
-- Profundizar en el desarrollo de agentes para aplicarlos en el area profesional.
+- Fortalecer habilidades de planificación y trabajo ágil.
+- Mantener comunicación constante.
+- Profundizar en agentes con aplicación profesional.
 
-### 🤝 Compromisos del Equipo
-- Cumplir con los tiempos establecidos en el plan de trabajo.  
-- Documentar correctamente cada avance.  
-- Apoyar a los compañeros en tareas críticas o retrasadas.
-- Mantener un equipo de trabajo con respeto y enfocado.
+## 🤝 Compromisos del Equipo
+- Cumplir tiempos del plan de trabajo.  
+- Documentar avances.  
+- Apoyo entre compañeros.  
+- Respeto y enfoque.
 
 ---
 
-## 🧰 Creación de Herramientas de Trabajo Colaborativo
-- **Repositorio en GitHub:** https://github.com/JRV-XVI/multi-farmer
-- **Herramienta de comunicación:** Discord / Whatsapp
+## 🧰 Herramientas Colaborativas
+- **Repositorio:** https://github.com/JRV-XVI/multi-farmer  
+- **Comunicación:** Discord / WhatsApp  
 - **Gestión de tareas:** Trello / GitHub Projects  
-- **Control de versiones:** Git (flujo de ramas: `main`, `develop`, `usuario/feature`)
+- **Control de versiones:** Git con flujo `main` → `develop` → `feature/usuario`
 
 ---
 
-## 🚀 Descripción del Reto a Desarrollar
+# 🚀 Reto del Proyecto
 
-Los cultivos agrícolas representan cerca del 80% de la dieta humana. En México, frutos de alta rotación como la fresa o el pepino deben cosecharse en ventanas cortas para preservar su valor comercial.  
-Actualmente, la detección de plagas y enfermedades depende de inspecciones visuales tardías, generando pérdidas de hasta 40% de la producción mundial (FAO, 2022).  
+Los cultivos agrícolas dependen de detección temprana de plagas y enfermedades. El virus **Rugoso del Tomate** afecta cultivos como tomate y pimiento, propagándose rápidamente y causando pérdidas críticas.
 
-### 🌱 Problema específico
-En cultivos como tomate o pimiento, el virus **Rugoso del Tomate** se propaga rápidamente mediante el contacto con herramientas o manos contaminadas. Los síntomas son tardíos y difíciles de identificar visualmente, lo que provoca la eliminación masiva de plantas.
+## 🌱 Problema
+Los síntomas aparecen tarde y son difíciles de identificar, generando eliminación masiva de plantas.
 
-### 💡 Solución propuesta
-Desarrollar un **sistema multiagente autónomo** capaz de:
-1. Monitorear continuamente las plantas dentro de un invernadero mediante agentes móviles / estaticos.  
-2. Detectar tempranamente signos de estrés o enfermedad mediante visión por computadora y sensores multiespectrales.  
-3. Transmitir los datos a un agente deliberativo de decisión que determine acciones de manejo.  
-4. El agente decidira en base a su entorno y desición sobre las medidas a ejecutar (eliminación o tratamiento).
-5. Si se necesita intervención humana, estara el operario (Agente Humano) para acciones especiales.
-
-**Objetivo general:**  
-Mejorar la eficiencia de detección y respuesta ante anomalías en cultivos agrícolas, reduciendo pérdidas y uso innecesario de recursos con el diseño de un sistema multiagente.
+## 💡 Solución Propuesta
+Un **sistema multiagente autónomo** que:
+1. Monitorea continuamente plantas.
+2. Detecta signos de estrés o enfermedad.
+3. Clasifica anomalías con IA.
+4. Decide acciones: tratamiento, purga o intervención humana.
+5. Coordina agentes para ejecución eficiente.
 
 ---
 
-## 🧩 Identificación de los Agentes Involucrados
+# 🧩 Refactorización de Agentes
 
-| Agente | Rol / Función | Tipo de arquitectura | Descripción breve |
-|---------|----------------|----------------------|-------------------|
-| Agente de Exploración (Robot Móvil) | Recorre el invernadero capturando imágenes y datos espectrales | **Reactivo** | Detecta estímulos del entorno y reacciona para recolectar información y evitar obstáculos. |
-| Agente de Análisis (IA de Diagnóstico) | Procesa la información visual para detectar anomalías | **Deliberativo** | Usa redes neuronales para identificar patrones y toma decisiones basadas en creencias y metas. |
-| Agente Coordinador (Supervisor Híbrido) | Coordina a los agentes y comunica las acciones al humano | **Híbrido** | Combina reacción inmediata ante alertas y planificación deliberativa para distribuir tareas. |
-| Agente Humano (Operario) | Recibe notificaciones y ejecuta acciones físicas | — | Representa la interacción humano-sistema y valida decisiones. |
+## 🔹 Agente Explorador (Híbrido)
 
----
+**Rol principal:**  
+Recorre el huerto analizando plantas para identificar posibles enfermedades.
 
-## 🧱 Componentes Arquitectónicos
+**Responsabilidades:**  
+- Analizar plantas con visión y sensores.  
+- Registrar coordenadas exactas de plantas enfermas.  
+- Calcular nivel de severidad inicial (índice espectral / modelo IA).  
+- Enviar reporte estructurado al Agente Coordinador.  
 
-### 🔹 Agente Reactivo (Explorador)
-**Capas:**
-- **Layer 0: Evitar Obstáculos**  
-   IF DetectaObstaculoFrontal() AND DistanciaObstaculo() <= 1m  
-   THEN Detener() AND Girar(ángulo) AND Avanzar()
-
-- **Layer 1: Recolectar Datos Críticos (Alta prioridad sensorial)**  
-   IF CambiosEspectralesSignificativos() OR VariaciónLuzBrusca() OR DetectaPlaga()  
-   THEN AjustarPosición() AND CapturarImagen() AND RegistrarEspectro()
-
-- **Layer 2: Recolectar Datos Regulares**  
-   IF TiempoDesdeÚltimaCaptura() > t AND NO DetectaAnomalía()  
-   THEN CapturarImagen() AND RegistrarEspectro()
-
-- **Layer 3: Reubicar para Mejor Observación**  
-   IF ImagenDifusa() OR SeñalEspectralDébil()  
-   THEN Reposicionar() AND ReintentarCaptura()
-
-- **Layer 4: Patrullaje / Vagar Controlado**  
-   IF NO DetectaObstaculos() AND NO DetectaAnomalías()  
-   THEN AvanzarRuta()  
-   ELSE AjustarTrayectoria()
-
-### 🔹 Agente Deliberativo (Análisis por IA)
-- **Creencias (B):** Base de datos de imágenes y patrones de enfermedades.  
-- **Deseos (D):** Mantener cultivos saludables y reducir infecciones.  
-- **Intenciones (I):** Clasificar anomalías y enviar alertas oportunas al supervisor.  
-
-### 🔹 Agente Híbrido (Coordinador)
-- **Capas Reactivas:** Responde a alertas de anomalía en tiempo real.  
-- **Componentes BDI:** Planifica la asignación de tareas y analiza la severidad del problema.  
-- **Integración:** Combina reactividad (alertas) y deliberación (gestión de acciones globales).
+**Arquitectura:**  
+- Reactivo para navegación (evitar obstáculos, patrullaje).  
+- Deliberativo para interpretación de imágenes y estimación de severidad.  
 
 ---
 
-## 📅 Plan de Trabajo
+## 🔹 Agente Recolector (Reactivo)
 
-### 📌 Actividades Pendientes
+**Rol principal:**  
+Recolecta toda la fruta sana siguiendo un camino eficiente.
 
-[Tablero del Proyecto en GitHub](https://github.com/JRV-XVI/multi-farmer/projects)
+**Responsabilidades:**  
+- Recibir lista de coordenadas de plantas sanas.  
+- Generar ruta optimizada (heurística TSP / distancia mínima).  
+- Navegar evitando obstáculos.  
+- Recolectar frutos y llevarlos al punto de acopio.  
 
-### 🧾 Actividades para la Primera Revisión
-
-| Actividad | Responsable | Fecha de realización | Intervalo de esfuerzo |
-|------------|-------------|-----------------------|-----------------------|
-| Definición formal de la arquitectura multiagente | [Nombre 2] | 20/11/2025 | 3–5 h |
-| Creación del repositorio y estructura de carpetas | [Nombre 3] | 18/11/2025 | 2–3 h |
-| Redacción de la propuesta y descripción de agentes | [Nombre 1] | 22/11/2025 | 4–6 h |
-
----
-
-## 📚 Aprendizaje Adquirido Del Equipo
-
-En esta etapa pudimos realizar con éxito el aterrizaje del reto para poder organizar en tiempo y forma las siguientes actividades para lograr con éxito a la solución del problema planteado. De igual forma empezar a documnetar con la herramienta Markdown y mantener un formato limpio y con buena estructura.
+**Arquitectura:**  
+- Reactivo puro: comportamiento basado en estímulos y prioridades.  
 
 ---
 
-📅 **Versión del documento:** v1.0  
-✏️ **Última actualización:** 10/11/2025  
-👨‍💻 **Equipo:** Nightgaunts
+## 🔹 Agente Purgador (Reactivo)
+
+**Rol principal:**  
+Eliminar plantas enfermas y desechar residuos de manera controlada.
+
+**Responsabilidades:**  
+- Recibir todas las coordenadas de plantas enfermas.  
+- Optimizar ruta para eliminación eficiente.  
+- Realizar proceso de purga: eliminar planta → embolsado → transporte.  
+- Llevar restos al basurero asignado.  
+
+**Arquitectura:**  
+- Reactivo puro con alta prioridad de seguridad.  
+
+---
+
+# 🧱 Componentes Arquitectónicos
+
+### Agente Reactivo (Explorador — nivel reactivo)
+- Evitar obstáculos.
+- Captura de datos ante estímulos espectrales.
+- Corrección de posición para mejor lectura.
+- Patrullaje controlado.
+
+### Agente Deliberativo (Análisis IA)
+- Procesamiento de imágenes.
+- Clasificación de anomalías.
+- Generación de alertas.
+
+### Agente Coordinador
+- Mezcla BDI + reactividad.
+- Distribución de tareas entre agentes.
+- Supervisión y comunicación con operario humano.
+
+---
+
+# 📅 Plan de Trabajo — Primera Iteración
+
+| Actividad | Responsable | Fecha | Tiempo |
+|------------|-------------|--------|---------|
+| Definición formal de arquitectura | Pendiente | 20/11/2025 | 3–5 h |
+| Creación estructura del repositorio | Pendiente | 18/11/2025 | 2–3 h |
+| Redacción propuesta y descripción de agentes | Pendiente | 22/11/2025 | 4–6 h |
+
+---
+
+# 📚 Aprendizajes del Equipo
+Se definió el reto, se documentó con Markdown y se estructuró un plan inicial.
+
+---
+
+📅 Versión del documento: **v1.1**  
+✏️ Última actualización: **10/11/2025**  
+👨‍💻 Equipo: **Nightgaunts**
