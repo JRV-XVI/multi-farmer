@@ -58,7 +58,7 @@ Mejorar la eficiencia de detección y respuesta ante anomalías en cultivos agr�
 
 | Agente | Rol / Función | Tipo de arquitectura | Descripción breve |
 |---------|----------------|----------------------|-------------------|
-| Agente de Monitoreo (Robot Móvil) | Recorre el invernadero capturando imágenes y datos espectrales | **Reactivo** | Detecta estímulos del entorno y reacciona para recolectar información y evitar obstáculos. |
+| Agente de Exploración (Robot Móvil) | Recorre el invernadero capturando imágenes y datos espectrales | **Reactivo** | Detecta estímulos del entorno y reacciona para recolectar información y evitar obstáculos. |
 | Agente de Análisis (IA de Diagnóstico) | Procesa la información visual para detectar anomalías | **Deliberativo** | Usa redes neuronales para identificar patrones y toma decisiones basadas en creencias y metas. |
 | Agente Coordinador (Supervisor Híbrido) | Coordina a los agentes y comunica las acciones al humano | **Híbrido** | Combina reacción inmediata ante alertas y planificación deliberativa para distribuir tareas. |
 | Agente Humano (Operario) | Recibe notificaciones y ejecuta acciones físicas | — | Representa la interacción humano-sistema y valida decisiones. |
@@ -67,7 +67,7 @@ Mejorar la eficiencia de detección y respuesta ante anomalías en cultivos agr�
 
 ## 🧱 Componentes Arquitectónicos
 
-### 🔹 Agente Reactivo (Robot de Monitoreo)
+### 🔹 Agente Reactivo (Explorador)
 **Capas:**
 - **Layer 0: Evitar Obstáculos**  
    IF DetectaObstaculoFrontal() AND DistanciaObstaculo() <= 1m  
@@ -106,12 +106,7 @@ Mejorar la eficiencia de detección y respuesta ante anomalías en cultivos agr�
 
 ### 📌 Actividades Pendientes
 
-| Actividad | Descripción | Fecha estimada | Responsable | Estado | Esfuerzo estimado |
-|------------|-------------|----------------|--------------|---------|--------------------|
-| Revisión bibliográfica sobre virus y plagas | Investigación de fuentes académicas | 18/11/2025 | [Nombre 1] | Pendiente | 5 h |
-| Definición de agentes y arquitectura general | Diseño de roles y relaciones | 20/11/2025 | [Nombre 2] | Pendiente | 4 h |
-| Creación del entorno de simulación 3D | Modelado del invernadero y los robots | 25/11/2025 | [Nombre 3] | Pendiente | 6 h |
-| Entrenamiento preliminar de modelo de detección | Prueba con dataset de hojas infectadas | 02/12/2025 | [Nombre 1] | Pendiente | 8 h |
+[Tablero del Proyecto en GitHub](https://github.com/JRV-XVI/multi-farmer/projects)
 
 ### 🧾 Actividades para la Primera Revisión
 
