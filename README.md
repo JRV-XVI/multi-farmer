@@ -44,7 +44,7 @@ Los síntomas aparecen tarde y son difíciles de identificar, generando eliminac
 Un **sistema multiagente autónomo** que:
 1. Monitorea continuamente plantas.
 2. Detecta signos de estrés o enfermedad.
-3. Clasifica anomalías con IA.
+3. Clasificacion de anomalías.
 4. Decide acciones: tratamiento, purga o intervención humana.
 5. Coordina agentes para ejecución eficiente.
 
@@ -123,19 +123,7 @@ Eliminar plantas enfermas y desechar residuos de manera controlada.
 
 ## 📅 Plan de Trabajo
 
-### 📌 Actividades Pendientes
-
 [Tablero del Proyecto en GitHub](https://github.com/JRV-XVI/multi-farmer/projects)
-
-### 🧾 Actividades para la Primera Revisión
-
-| Actividad | Responsable | Fecha de realización | Intervalo de esfuerzo |
-|------------|-------------|-----------------------|-----------------------|
-| Definición formal de la arquitectura multiagente | [Nombre 2] | 20/11/2025 | 3–5 h |
-| Creación del repositorio y estructura de carpetas | [Nombre 3] | 18/11/2025 | 2–3 h |
-| Redacción de la propuesta y descripción de agentes | [Nombre 1] | 22/11/2025 | 4–6 h |
-
----
 
 ## 📚 Aprendizaje Adquirido Del Equipo
 
