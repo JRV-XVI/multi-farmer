@@ -131,7 +131,9 @@ Funciona bajo una arquitectura **reactiva con alta prioridad de seguridad**, gar
 
 ## 📚 Aprendizaje Adquirido Del Equipo
 
-En esta etapa pudimos realizar con éxito el aterrizaje del reto para poder organizar en tiempo y forma las siguientes actividades para lograr con éxito a la solución del problema planteado. De igual forma empezar a documnetar con la herramienta Markdown y mantener un formato limpio y con buena estructura.
+Durante esta fase del proyecto, nuestro equipo consolidó conocimientos clave relacionados con el modelado de sistemas multiagente y la estructuración del mundo virtual para la simulación 3D. Logramos comprender cómo definir claramente los roles de cada agente, sus interacciones y los subsistemas internos que les permiten ejecutar comportamientos complejos dentro del entorno simulado.
+
+Aprendimos a emplear diferentes diagramas UML (clases, interacción, actividades y estados) para representar de manera formal y precisa la arquitectura del sistema. Esto nos permitió mejorar la comunicación interna del equipo y facilitar el entendimiento del flujo de operaciones entre agentes.
 
 ---
 
