@@ -1,4 +1,12 @@
 # 🧠 Multi-Farmer
+## 🛠️ Requisitos para Desarrollo
+- Unity 6000.2.10f1 (versión requerida para garantizar compatibilidad con el proyecto)
+- .NET SDK 8.0+ (para scripts y herramientas externas)
+- Python 3.10+ (si se usa procesamiento de datos o modelos IA)
+- Visual Studio Code o Visual Studio 2022
+- Git (para control de versiones)
+- GitHub Desktop (opcional)
+- Docker (para desplegar el servicio de análisis de imágenes a través de un endpoint REST)
 
 ## 👥 Conformación del Equipo
 
