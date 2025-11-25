@@ -1,0 +1,397 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.UIElements;
+using static UnityEngine.GraphicsBuffer;
+using static UnityEngine.UI.GridLayoutGroup;
+
+public class Bot : MonoBehaviour
+{
+    private StateMachine<Bot> _stateMachine;
+    private Rigidbody _rb;
+    private CapsuleCollider _capsuleCollider;
+
+    public Manager manager;
+    public DropZoneManager dropZoneManager; // Gestor de zonas de descarga
+    public SimulationMetrics metrics; // Sistema de métricas
+    
+    public GameObject targetPlant;
+    public GameObject safeZone; // Mantener compatibilidad (deprecated)
+    public DropZone assignedDropZone; // Zona asignada dinámicamente
+    public Vector2 destiny;
+    private Map _map;
+
+    [SerializeField] private List<Cell> _currentPath;
+
+    private Movement _movement;
+    public bool isCarring;
+
+    [Header("Tomato Collection")]
+    public int maxTomatoCapacity = 5;
+    private List<GameObject> _collectedTomatoes = new List<GameObject>();
+
+
+    //Para movimiento
+    [SerializeField] private int _pathIndex = 0;
+    public bool isMovingPath = false;
+
+    public int id;
+
+
+    void Start()
+    {
+        _rb = GetComponent<Rigidbody>();
+        _capsuleCollider = GetComponent<CapsuleCollider>();
+
+        // Configurar Rigidbody para evitar problemas de colisión
+        if (_rb != null)
+        {
+            _rb.freezeRotation = true; // Evitar que se voltee
+            _rb.useGravity = true;
+            _rb.isKinematic = false;
+            _rb.interpolation = RigidbodyInterpolation.Interpolate;
+            _rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+            _rb.constraints = RigidbodyConstraints.FreezeRotation; // Congelar todas las rotaciones
+        }
+
+        manager = GameObject.FindGameObjectWithTag("Manager").gameObject.GetComponent<Manager>();
+        _movement = GetComponent<Movement>();
+        
+        // Buscar el gestor de zonas de descarga
+        dropZoneManager = FindFirstObjectByType<DropZoneManager>();
+        
+        // Buscar sistema de métricas
+        metrics = FindFirstObjectByType<SimulationMetrics>();
+        if (dropZoneManager == null)
+        {
+            Debug.LogWarning("No se encontró DropZoneManager. Usando sistema legacy con safeZone.");
+        }
+    
+        _stateMachine = new StateMachine<Bot>();
+        _stateMachine.ChangeState(new BotIdleState(this));
+
+        _map = new Map(manager.mapSize.x, manager.mapSize.y, new Vector2(0, 0));
+        _map.MarkAll();
+
+        isCarring = false;
+
+    }
+
+
+
+    private void Update()
+    {
+        _stateMachine.Update();
+
+
+    }
+
+    //Funcion para maquina de estados
+    public void ChangeState(State<Bot> newState)
+    {
+        _stateMachine.ChangeState(newState);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        _stateMachine.OnTriggerEnter(other);
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        _stateMachine.OnTriggerStay(other);
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        _stateMachine.OnTriggerExit(other);
+    }
+
+
+
+
+    //Funciones propias
+    public void CalculateRoute(Vector2 destiny)
+    {
+        
+        if(destiny != null) {
+            
+
+            Vector2 botPos = new Vector2(this.transform.position.x, this.transform.position.z);
+
+            _currentPath.Clear();
+            _currentPath = _map.FindPath(botPos, destiny);
+
+            string camino = "";
+            foreach (Cell cell in _currentPath)
+            {
+                camino += "(" + cell.worldX + ", " + cell.worldY + "), ";
+            }
+
+            Debug.Log("bot: " + botPos + " des: " + destiny);
+            Debug.Log("Path: " + camino);
+
+            
+            isMovingPath = true;
+
+
+        }
+        else
+        {
+            Debug.LogWarning("No hay posicion destino. Es null");
+        }
+
+        _pathIndex = 0;
+    }
+
+
+
+    public void FindPlant()
+    {
+        targetPlant = manager.GetFreePlant();
+
+    }
+
+
+    public void FollowPath()
+    {
+        if (_currentPath == null || _currentPath.Count == 0)
+        {
+            isMovingPath = false;
+            return;
+        }
+
+        // Si ya llego al punto anterior, pasar al siguiente
+        if (_movement.HasArrived())
+        {
+            if (_pathIndex >= _currentPath.Count)
+            {
+                isMovingPath = false;
+                return;
+            }
+
+            Cell c = _currentPath[_pathIndex];
+            Vector3 target = new Vector3(c.worldX, transform.position.y, c.worldY);
+
+
+            _movement.MoveTo(target);
+            _pathIndex++;
+        }
+    }
+
+    public void EvadeOtherBot(GameObject otherBot)
+    {
+        Debug.LogWarning("Se intenta evadir otro bot");
+
+        _map.MarkTemporalObstacle(_map, otherBot);
+        //CalculateRoute(destiny);
+    }
+
+
+    //Funcion para esperar tiempo
+    public IEnumerator WaitSeconds(float sec)
+    {
+        Debug.Log("Bot empieza a esperar...");
+
+        // Espera 5 segundos
+        yield return new WaitForSeconds(sec);
+
+        Debug.Log("Bot termin� de esperar, ahora act�a");
+        // Aqu� pones la acci�n que quieres que haga despu�s de esperar
+    }
+
+
+
+
+    //Funciones con otros objetos
+    public void TakeObject(GameObject other)
+    {
+        //Hacer que el objeto sea hijo del player
+        other.transform.SetParent(transform);
+
+        //Ajusta la posicion y rotaci�n del objeto a la del player
+        other.transform.localPosition = new Vector3(0, 2, 0);
+        other.transform.localRotation = Quaternion.identity;
+
+        isCarring = true;
+    }
+
+    public void DropObject(GameObject other)
+    {
+        //Quitar la relación de hijo con el player
+        other.transform.SetParent(null);
+
+        //Dar una posición justo enfrente del player al soltarlo
+        other.transform.position = transform.position + transform.forward * 0.9f;
+
+        isCarring = false;
+    }
+
+    // Nuevas funciones para manejo de tomates
+    public int GetCollectedTomatoCount()
+    {
+        // Limpiar referencias null
+        _collectedTomatoes.RemoveAll(t => t == null);
+        return _collectedTomatoes.Count;
+    }
+
+    public bool IsTomatoCapacityFull()
+    {
+        return GetCollectedTomatoCount() >= maxTomatoCapacity;
+    }
+
+    public bool HasTomatoes()
+    {
+        return GetCollectedTomatoCount() > 0;
+    }
+
+    public void CollectTomatoFromPlant(GameObject tomato)
+    {
+        if (tomato == null || IsTomatoCapacityFull())
+            return;
+
+        // Hacer el tomate hijo del bot
+        tomato.transform.SetParent(transform);
+        
+        // Posicionar los tomates en stack
+        float yOffset = 1f + (_collectedTomatoes.Count * 0.3f);
+        tomato.transform.localPosition = new Vector3(0, yOffset, 0);
+        tomato.transform.localRotation = Quaternion.identity;
+
+        _collectedTomatoes.Add(tomato);
+        isCarring = true;
+
+        Debug.Log($"Bot recogió tomate. Total: {_collectedTomatoes.Count}/{maxTomatoCapacity}");
+    }
+
+    public void DropAllTomatoes()
+    {
+        Debug.Log($"Bot descargando {_collectedTomatoes.Count} tomates");
+        
+        int tomatoCount = _collectedTomatoes.Count;
+
+        foreach (GameObject tomato in _collectedTomatoes)
+        {
+            if (tomato != null)
+            {
+                Destroy(tomato); // Destruir el tomate al descargarlo
+            }
+        }
+
+        _collectedTomatoes.Clear();
+        isCarring = false;
+        
+        // Notificar a la zona de descarga
+        if (assignedDropZone != null)
+        {
+            assignedDropZone.DepositTomatoes(tomatoCount);
+        }
+    }
+    
+    /// <summary>
+    /// Solicita y asigna una zona de descarga óptima para este bot.
+    /// </summary>
+    public bool RequestDropZone()
+    {
+        // Si ya tiene una zona asignada y sigue siendo válida, mantenerla
+        if (assignedDropZone != null && assignedDropZone.IsAvailable())
+        {
+            return true;
+        }
+        
+        if (dropZoneManager == null)
+        {
+            // Fallback al sistema legacy
+            if (safeZone != null)
+            {
+                // Verificar si el safeZone tiene DropZone component
+                SafeZone sz = safeZone.GetComponent<SafeZone>();
+                if (sz != null && sz.dropZoneComponent != null)
+                {
+                    assignedDropZone = sz.dropZoneComponent;
+                    Debug.Log($"Bot {id}: Usando DropZone del SafeZone legacy");
+                    return true;
+                }
+                Debug.Log($"Bot {id}: Usando SafeZone legacy puro");
+                return true;
+            }
+            Debug.LogWarning($"Bot {id}: No hay DropZoneManager ni SafeZone");
+            return false;
+        }
+        
+        assignedDropZone = dropZoneManager.AssignDropZone(this, GetCollectedTomatoCount());
+        
+        if (assignedDropZone != null)
+        {
+            Debug.Log($"Bot {id}: Zona asignada: {assignedDropZone.gameObject.name}");
+            return true;
+        }
+        
+        // �ltimo intento: usar safeZone legacy si existe
+        if (safeZone != null)
+        {
+            SafeZone sz = safeZone.GetComponent<SafeZone>();
+            if (sz != null)
+            {
+                if (sz.dropZoneComponent != null && sz.dropZoneComponent.IsAvailable())
+                {
+                    assignedDropZone = sz.dropZoneComponent;
+                    Debug.Log($"Bot {id}: Fallback a SafeZone con DropZone");
+                    return true;
+                }
+                if (sz.IsAvailable())
+                {
+                    Debug.Log($"Bot {id}: Fallback a SafeZone legacy");
+                    return true;
+                }
+            }
+        }
+        
+        Debug.LogWarning($"Bot {id}: No hay zonas disponibles en ning�n sistema");
+        return false;
+    }
+    
+    /// <summary>
+    /// Libera la zona de descarga asignada.
+    /// </summary>
+    public void ReleaseDropZone()
+    {
+        if (dropZoneManager != null && assignedDropZone != null)
+        {
+            dropZoneManager.ReleaseAssignment(this);
+            Debug.Log($"Bot {id}: Zona liberada");
+            assignedDropZone = null;
+        }
+    }
+    
+    /// <summary>
+    /// Obtiene la posición de destino para descargar tomates.
+    /// </summary>
+    public Vector2 GetDropZonePosition()
+    {
+        // Prioridad 1: Zona asignada por el nuevo sistema
+        if (assignedDropZone != null)
+        {
+            Vector3 pos = assignedDropZone.transform.position;
+            Debug.Log($"Bot {id}: Usando zona asignada en posición ({pos.x}, {pos.z})");
+            return new Vector2(pos.x, pos.z);
+        }
+        
+        // Prioridad 2: Sistema legacy (safeZone única)
+        if (safeZone != null)
+        {
+            Vector3 pos = safeZone.transform.position;
+            Debug.Log($"Bot {id}: Usando safeZone legacy en posición ({pos.x}, {pos.z})");
+            return new Vector2(pos.x, pos.z);
+        }
+        
+        Debug.LogError($"Bot {id} no tiene zona de descarga asignada ni safeZone!");
+        return Vector2.zero;
+    }
+
+
+
+}

@@ -1,0 +1,15 @@
+Time,CompleteStacks,TomatoesDelivered,TotalMovements,Bot1Moves,Bot2Moves,Bot3Moves,Bot4Moves,Bot5Moves,Collisions,ActiveBots,Efficiency
+2.45,0,0,100,20,19,20,20,21,0,5,0.00
+7.46,0,0,309,62,60,62,61,64,0,5,0.00
+12.53,0,0,518,105,102,103,103,105,0,5,0.00
+17.54,0,0,649,144,139,142,118,106,0,5,0.00
+22.55,0,0,696,148,139,185,118,106,0,5,0.00
+27.55,0,0,739,148,139,228,118,106,0,5,0.00
+
+=== RESUMEN FINAL ===
+Tiempo Total (s),29.05
+Tomates Entregados,0
+Pilas Completas,0
+Movimientos Totales,751
+Colisiones Totales,0
+Eficiencia (tomates/min),0.00
