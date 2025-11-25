@@ -41,7 +41,6 @@ public class Manager : MonoBehaviour
             }
         }
 
-        Debug.LogWarning("No hubo plantas libres");
         return null;
     }
 
