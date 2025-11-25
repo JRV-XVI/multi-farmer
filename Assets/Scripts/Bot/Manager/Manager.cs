@@ -4,6 +4,7 @@ using UnityEngine;
 public class Manager : MonoBehaviour
 {
     public GameObject[] _plantList;
+    public int numFreePlants;
 
     public Vector2Int mapSize;
 
@@ -13,7 +14,7 @@ public class Manager : MonoBehaviour
     {
         _plantList = GameObject.FindGameObjectsWithTag("Plant");
 
-
+        numFreePlants = _plantList.Length;
 
     }
 
@@ -37,11 +38,13 @@ public class Manager : MonoBehaviour
             if (!plantComp.isTaken)
             {
                 plantComp.isTaken = true;
+                numFreePlants--;
                 return plant;
+                
             }
         }
 
-        Debug.LogWarning("No hubo plantas libres");
+        Debug.LogWarning("No hubo plantas libres. Cantidad: " + numFreePlants);
         return null;
     }
 

@@ -28,9 +28,8 @@ public class BotDownloadState : State<Bot>
         if (other.gameObject == owner.safeZone && owner.targetPlant != null)
         {
             Debug.Log("Triger activado por safe zone");
-            owner.DropObject(owner.targetPlant.gameObject);
+            owner.DropObjects();
 
-            other.gameObject.GetComponent<SafeZone>().TakeObject(owner.targetPlant);
             owner.targetPlant = null;
 
             owner.ChangeState(new BotIdleState(owner));
@@ -42,9 +41,8 @@ public class BotDownloadState : State<Bot>
         if (other.gameObject == owner.safeZone && owner.targetPlant != null)
         {
             Debug.Log("Triger activado por safe zone");
-            owner.DropObject(owner.targetPlant.gameObject);
+            owner.DropObjects();
 
-            other.gameObject.GetComponent<SafeZone>().TakeObject(owner.targetPlant);
             owner.targetPlant = null;
 
             owner.ChangeState(new BotIdleState(owner));

@@ -31,8 +31,17 @@ public class BotCollectingState : State<Bot>
             Debug.Log("Triger activado por planta");
             owner.TakeObject(other.gameObject);
 
-            owner.destiny = new Vector2(owner.safeZone.transform.position.x, owner.safeZone.transform.position.z);
-            owner.ChangeState(new BotMovingState(owner));
+            if(owner.numObjectsCarring < owner.numObjectsCapacity && owner.manager.numFreePlants > 0){
+                owner.FindPlant();
+                owner.destiny = new Vector2(owner.targetPlant.transform.position.x, owner.targetPlant.transform.position.z);
+                owner.ChangeState(new BotMovingState(owner));
+                return;
+            } 
+            else if (owner.numObjectsCarring >= owner.numObjectsCapacity || owner.manager.numFreePlants == 0){
+                owner.destiny = new Vector2(owner.safeZone.transform.position.x, owner.safeZone.transform.position.z);
+                owner.ChangeState(new BotMovingState(owner));
+            }
+            
         }
     }
 
@@ -43,8 +52,16 @@ public class BotCollectingState : State<Bot>
             Debug.Log("Triger activado por planta");
             owner.TakeObject(other.gameObject);
 
-            owner.destiny = new Vector2(owner.safeZone.transform.position.x, owner.safeZone.transform.position.z);
-            owner.ChangeState(new BotMovingState(owner));
+            if(owner.numObjectsCarring < owner.numObjectsCapacity && owner.manager.numFreePlants > 0){
+                owner.FindPlant();
+                owner.destiny = new Vector2(owner.targetPlant.transform.position.x, owner.targetPlant.transform.position.z);
+                owner.ChangeState(new BotMovingState(owner));
+                return;
+            } 
+            else if (owner.numObjectsCarring >= owner.numObjectsCapacity || owner.manager.numFreePlants == 0){
+                owner.destiny = new Vector2(owner.safeZone.transform.position.x, owner.safeZone.transform.position.z);
+                owner.ChangeState(new BotMovingState(owner));
+            }
         }
     }
 

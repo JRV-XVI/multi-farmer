@@ -25,6 +25,8 @@ public class Bot : MonoBehaviour
 
     private Movement _movement;
     public bool isCarring;
+    public int numObjectsCarring;
+    public int numObjectsCapacity;
 
 
     //Para movimiento
@@ -32,6 +34,7 @@ public class Bot : MonoBehaviour
     public bool isMovingPath = false;
 
     public int id;
+
 
 
     void Start()
@@ -49,7 +52,8 @@ public class Bot : MonoBehaviour
         _map.MarkAll();
 
         isCarring = false;
-
+        numObjectsCarring = 0;
+        numObjectsCapacity = 5;
     }
 
 
@@ -171,8 +175,8 @@ public class Bot : MonoBehaviour
         // Espera 5 segundos
         yield return new WaitForSeconds(sec);
 
-        Debug.Log("Bot terminó de esperar, ahora actúa");
-        // Aquí pones la acción que quieres que haga después de esperar
+        Debug.Log("Bot terminï¿½ de esperar, ahora actï¿½a");
+        // Aquï¿½ pones la acciï¿½n que quieres que haga despuï¿½s de esperar
     }
 
 
@@ -184,7 +188,7 @@ public class Bot : MonoBehaviour
         //Hacer que el objeto sea hijo del player
         other.transform.SetParent(transform);
 
-        //Ajusta la posicion y rotación del objeto a la del player
+        //Ajusta la posicion y rotaciï¿½n del objeto a la del player
         other.transform.localPosition = new Vector3(0, 2, 0);
         other.transform.localRotation = Quaternion.identity;
 
@@ -193,13 +197,28 @@ public class Bot : MonoBehaviour
 
     public void DropObject(GameObject other)
     {
-        //Quitar la relación de hijo con el player
+        //Quitar la relaciï¿½n de hijo con el player
         other.transform.SetParent(null);
 
-        //Dar una posición justo enfrente del player al soltarlo
+        //Dar una posiciï¿½n justo enfrente del player al soltarlo
         other.transform.position = transform.position + transform.forward * 0.9f;
+        safeZone.GetComponent<SafeZone>().TakeObject(other);
 
-        isCarring = false;
+        if(numObjectsCarring > 0){
+            numObjectsCarring--;
+        }
+        if(numObjectsCarring == 0){
+            isCarring = false;
+        }
+    }
+
+    public void DropObjects()
+    {
+        foreach(Transform child in transform)
+        {
+            DropObject(child.gameObject);
+        }
+
     }
 
 
