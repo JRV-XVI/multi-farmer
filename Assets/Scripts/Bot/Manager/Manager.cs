@@ -11,10 +11,13 @@ public class Manager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        Animator animator = GetComponent<Animator>();
+        if (animator != null && animator.runtimeAnimatorController == null)
+        {
+            animator.enabled = false;
+        }
+        
         _plantList = GameObject.FindGameObjectsWithTag("Plant");
-
-
-
     }
 
     // Update is called once per frame

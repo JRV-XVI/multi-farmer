@@ -26,6 +26,9 @@ public class Bot : MonoBehaviour
     private Movement _movement;
     public bool isCarring;
 
+    public int maxTomatoCapacity = 10;
+    public Transform assignedDropZone;
+    private int _collectedTomatoCount = 0;
 
     //Para movimiento
     [SerializeField] private int _pathIndex = 0;
@@ -171,8 +174,8 @@ public class Bot : MonoBehaviour
         // Espera 5 segundos
         yield return new WaitForSeconds(sec);
 
-        Debug.Log("Bot terminó de esperar, ahora actúa");
-        // Aquí pones la acción que quieres que haga después de esperar
+        Debug.Log("Bot terminï¿½ de esperar, ahora actï¿½a");
+        // Aquï¿½ pones la acciï¿½n que quieres que haga despuï¿½s de esperar
     }
 
 
@@ -184,7 +187,7 @@ public class Bot : MonoBehaviour
         //Hacer que el objeto sea hijo del player
         other.transform.SetParent(transform);
 
-        //Ajusta la posicion y rotación del objeto a la del player
+        //Ajusta la posicion y rotaciï¿½n del objeto a la del player
         other.transform.localPosition = new Vector3(0, 2, 0);
         other.transform.localRotation = Quaternion.identity;
 
@@ -193,15 +196,18 @@ public class Bot : MonoBehaviour
 
     public void DropObject(GameObject other)
     {
-        //Quitar la relación de hijo con el player
+        //Quitar la relaciÃ³n de hijo con el player
         other.transform.SetParent(null);
 
-        //Dar una posición justo enfrente del player al soltarlo
+        //Dar una posiciÃ³n justo enfrente del player al soltarlo
         other.transform.position = transform.position + transform.forward * 0.9f;
 
         isCarring = false;
     }
 
-
+    public int GetCollectedTomatoCount()
+    {
+        return _collectedTomatoCount;
+    }
 
 }
