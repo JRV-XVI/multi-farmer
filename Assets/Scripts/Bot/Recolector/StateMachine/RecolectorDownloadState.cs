@@ -1,15 +1,14 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class BotDownloadState : State<Bot>
+public class RecolectorDownloadState : State<Recolector>
 {
-    public BotDownloadState(Bot owner) : base(owner) { }
-
+    public RecolectorDownloadState(Recolector owner) : base(owner) { }
 
 
     public override void OnEnterState()
     {
-        Debug.Log("Bot entro a DownloadState");
+        Debug.Log("Recolector entro a DownloadState");
 
     }
 
@@ -32,7 +31,7 @@ public class BotDownloadState : State<Bot>
 
             owner.targetPlant = null;
 
-            owner.ChangeState(new BotIdleState(owner));
+            owner.ChangeState(new RecolectorIdleState(owner));
         }
     }
 
@@ -42,19 +41,12 @@ public class BotDownloadState : State<Bot>
         {
             Debug.Log("Triger activado por safe zone");
             
-            DownloadCarringInZone(other.gameObject);
+            owner.DownloadCarringInZone();
 
-            owner.ChangeState(new BotIdleState(owner));
+            owner.ChangeState(new RecolectorIdleState(owner));
         }
     }
 
-    public void DownloadCarringInZone(GameObject zone)
-    {
-        foreach(Transform child in owner.transform)
-        {
-            zone.GetComponent<SafeZone>().TakeObject(child.gameObject);
-        }
-    }
 
 
 

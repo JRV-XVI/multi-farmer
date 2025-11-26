@@ -17,7 +17,6 @@ public class Bot : MonoBehaviour
     public Manager manager;
     
     public GameObject targetPlant;
-    public GameObject safeZone;
     public Vector2 destiny;
     private Map _map;
 
@@ -37,7 +36,7 @@ public class Bot : MonoBehaviour
 
 
 
-    void Start()
+    virtual protected void Start()
     {
         _rb = GetComponent<Rigidbody>();
         _capsuleCollider = GetComponent<CapsuleCollider>();
@@ -45,8 +44,6 @@ public class Bot : MonoBehaviour
         manager = GameObject.FindGameObjectWithTag("Manager").gameObject.GetComponent<Manager>();
         _movement = GetComponent<Movement>();
     
-        _stateMachine = new StateMachine<Bot>();
-        _stateMachine.ChangeState(new BotIdleState(this));
 
         _map = new Map(manager.mapSize.x, manager.mapSize.y, new Vector2(0, 0));
         _map.MarkAll();
@@ -58,10 +55,9 @@ public class Bot : MonoBehaviour
 
 
 
-    private void Update()
+    virtual protected void Update()
     {
         _stateMachine.Update();
-
 
     }
 
@@ -123,13 +119,6 @@ public class Bot : MonoBehaviour
         _pathIndex = 0;
     }
 
-
-
-    public void FindPlant()
-    {
-        targetPlant = manager.GetFreePlant();
-
-    }
 
 
     public void FollowPath()
@@ -202,7 +191,6 @@ public class Bot : MonoBehaviour
 
         //Dar una posici�n justo enfrente del player al soltarlo
         other.transform.position = transform.position + transform.forward * 0.9f;
-        safeZone.GetComponent<SafeZone>().TakeObject(other);
 
         if(numObjectsCarring > 0){
             numObjectsCarring--;
