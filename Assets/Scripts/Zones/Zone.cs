@@ -3,9 +3,9 @@ using UnityEngine;
 public class Zone : MonoBehaviour
 {
     private GameManager _gameManager;
-    private float _maxCarryWeight;
-    private float _currentCarryWeight;
-    private int _currentTomatosDeposited;
+    [SerializeField] private float _maxCarryWeight;
+    [SerializeField] private float _currentCarryWeight;
+    [SerializeField] private int _currentThingsNumberDeposited;
 
     public bool isSafeZoneForRecolector;
 
@@ -13,7 +13,7 @@ public class Zone : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        _gameManager = GameObject.FindWithTag("GameManager").GetComponent<Manager>();
+        _gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
         if(_gameManager == null)
         {
             Debug.LogError("GameManager not found in the scene!!");
@@ -22,7 +22,7 @@ public class Zone : MonoBehaviour
 
         if( isSafeZoneForRecolector)
         {
-            _maxCarryWeight = _gameManager.recolectorMaxCarryWeight;
+            _maxCarryWeight = _gameManager.safeZoneMaxCarryWeight;
         } else
         {
             _maxCarryWeight = _gameManager.trashoneMaxCarryWeight;
@@ -32,10 +32,10 @@ public class Zone : MonoBehaviour
     }
 
     
-    public float DepositeTomatos(float weight, int number)
+    public float DepositeThings(float weight, int number)
     {
         _currentCarryWeight += weight;
-        _currentTomatosDeposited += number;
+        _currentThingsNumberDeposited += number;
 
         if(_currentCarryWeight > _maxCarryWeight)
         {

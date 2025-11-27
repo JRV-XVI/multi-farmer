@@ -1,6 +1,7 @@
+using System.Collections.Generic;
 using UnityEngine;
 
-public class Purgador : MonoBehaviour
+public class Purgator : MonoBehaviour
 {
     private GameManager _gameManager;
     
@@ -20,7 +21,7 @@ public class Purgador : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        _gameManager = GameObject.FindWithTag("GameManager").GetComponent<Manager>();
+        _gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
         if(_gameManager == null)
         {
             Debug.LogError("GameManager not found in the scene!!");
@@ -73,7 +74,7 @@ public class Purgador : MonoBehaviour
         plant.SetActive(false);
 
         _currentCarryWeight += plant.GetComponent<Plant>().plantWeight;
-        _currentTomatosCollected += plant.GetComponent<Plant>().tomatosNumber;
+        _currentPlantsCollected += 1;
 
         TrackNextObject();
 
@@ -81,9 +82,9 @@ public class Purgador : MonoBehaviour
 
     private void DownloadWeight()
     {
-        SafeZone safeZone = zone.GetComponent<SafeZone>();
-        float exceededWeight = safeZone.DepositeTomatos(_currentCarryWeight, _currentTomatosCollected);
+        Zone safeZone = zone.GetComponent<Zone>();
+        float exceededWeight = safeZone.DepositeThings(_currentCarryWeight, _currentPlantsCollected);
         _currentCarryWeight = exceededWeight;
-        _currentTomatosCollected = 0;
+        _currentPlantsCollected = 0;
     }
 }
