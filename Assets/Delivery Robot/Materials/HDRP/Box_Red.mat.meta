@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2a4a23b7387e9b54ba0e2f1e254cce69
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185414
+  packageName: Delivery Robot
+  packageVersion: 1.0
+  assetPath: Assets/Delivery Robot/Materials/HDRP/Box_Red.mat
+  uploadId: 407310

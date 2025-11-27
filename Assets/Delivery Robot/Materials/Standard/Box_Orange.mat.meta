@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: efab50acf55713344956a4e19a6f1e92
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185414
+  packageName: Delivery Robot
+  packageVersion: 1.0
+  assetPath: Assets/Delivery Robot/Materials/Standard/Box_Orange.mat
+  uploadId: 407310

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: f04c58daee6db1249bcf169b6cf13c45
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185414
+  packageName: Delivery Robot
+  packageVersion: 1.0
+  assetPath: Assets/Delivery Robot/Prefabs/Standard/Robot_Blue Variant.prefab
+  uploadId: 407310

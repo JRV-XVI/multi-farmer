@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d69264887e47a604b8ae41994d2bbc64
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185414
+  packageName: Delivery Robot
+  packageVersion: 1.0
+  assetPath: Assets/Delivery Robot/Materials/Standard/Robot_Red.mat
+  uploadId: 407310

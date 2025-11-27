@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: cc279f80c7da7774d8edafda3aa582b1
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185414
+  packageName: Delivery Robot
+  packageVersion: 1.0
+  assetPath: Assets/Delivery Robot/Prefabs/URP/Robot_Green Variant.prefab
+  uploadId: 407310

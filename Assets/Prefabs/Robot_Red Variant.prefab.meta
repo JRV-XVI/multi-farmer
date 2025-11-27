@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 914575360e0fc6748b940d93cbfe811c
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185414
+  packageName: Delivery Robot
+  packageVersion: 1.0
+  assetPath: Assets/Delivery Robot/Prefabs/Standard/Robot_Red Variant.prefab
+  uploadId: 407310
