@@ -229,6 +229,7 @@ PrefabInstance:
     - {fileID: -516098083770646512, guid: bfbfbe9bffc13aa42aefcb447baa5f5d, type: 3}
     - {fileID: -7640558969779515294, guid: bfbfbe9bffc13aa42aefcb447baa5f5d, type: 3}
     - {fileID: 5233112405309087440, guid: bfbfbe9bffc13aa42aefcb447baa5f5d, type: 3}
+    - {fileID: 6335250783087129314, guid: bfbfbe9bffc13aa42aefcb447baa5f5d, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bfbfbe9bffc13aa42aefcb447baa5f5d, type: 3}
@@ -818,7 +819,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97cd1d357ac77a04283d7587e4ac1c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RobotPrueba
-  plantaObjetivo: {fileID: 0}
+  plantaObjetivo: {fileID: 1794295400}
 --- !u!195 &1664467707
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -929,7 +930,7 @@ Transform:
   m_GameObject: {fileID: 1664467705}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.44, y: 1.16, z: 9.83}
+  m_LocalPosition: {x: -6.4399986, y: 1.16, z: 10.83}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1032,6 +1033,17 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &1794295400 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2619682522909481784, guid: ab1bc6ab12430c544884a6d75c719368, type: 3}
+  m_PrefabInstance: {fileID: 1936016169}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53cd8ca180df7bd4b87e0ed687504dec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlantaDeTomate
 --- !u!1001 &1936016169
 PrefabInstance:
   m_ObjectHideFlags: 0
