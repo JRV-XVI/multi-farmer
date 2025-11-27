@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: bf7a0b0eac96d9c4fa90abe22fb68fac
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185414
+  packageName: Delivery Robot
+  packageVersion: 1.0
+  assetPath: Assets/Delivery Robot/Prefabs/URP/Robot_Orange.prefab
+  uploadId: 407310
