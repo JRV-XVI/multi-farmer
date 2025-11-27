@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Recolector : MonoBehaviour
@@ -20,7 +21,7 @@ public class Recolector : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        _gameManager = GameObject.FindWithTag("GameManager").GetComponent<Manager>();
+        _gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
         if(_gameManager == null)
         {
             Debug.LogError("GameManager not found in the scene!!");
@@ -81,7 +82,7 @@ public class Recolector : MonoBehaviour
 
     private void DownloadWeight()
     {
-        SafeZone safeZone = this.safeZone.GetComponent<SafeZone>();
+        Zone safeZone = this.safeZone.GetComponent<Zone>();
         float exceededWeight = safeZone.DepositeTomatos(_currentCarryWeight, _currentTomatosCollected);
         _currentCarryWeight = exceededWeight;
         _currentTomatosCollected = 0;

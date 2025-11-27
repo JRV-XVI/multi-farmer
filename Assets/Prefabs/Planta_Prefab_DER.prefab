@@ -14,9 +14,9 @@ GameObject:
   - component: {fileID: 1328615443907397677}
   - component: {fileID: 428387298993699145}
   - component: {fileID: 6831187981917689122}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Planta_Prefab_DER
-  m_TagString: Untagged
+  m_TagString: Plant
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -163,7 +163,7 @@ GameObject:
   - component: {fileID: 8576795308273934773}
   - component: {fileID: 5323634918096990216}
   - component: {fileID: 5755756215760807816}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -287,7 +287,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2508503208287918742}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: PuntoInteraccion
   m_TagString: Untagged
   m_Icon: {fileID: 0}

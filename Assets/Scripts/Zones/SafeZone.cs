@@ -13,7 +13,7 @@ public class Zone : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        _gameManager = GameObject.FindWithTag("GameManager").GetComponent<Manager>();
+        _gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
         if(_gameManager == null)
         {
             Debug.LogError("GameManager not found in the scene!!");

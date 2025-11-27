@@ -813,6 +813,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1562808904584821711, guid: ab1bc6ab12430c544884a6d75c719368, type: 3}
+      propertyPath: m_TagString
+      value: Plant
+      objectReference: {fileID: 0}
     - target: {fileID: 8493739682426271334, guid: ab1bc6ab12430c544884a6d75c719368, type: 3}
       propertyPath: m_Name
       value: Prefab_Cuadrante

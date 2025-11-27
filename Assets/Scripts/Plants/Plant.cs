@@ -1,4 +1,6 @@
-struct Plant
+using UnityEngine;
+
+public class Plant : MonoBehaviour
 {
     public int id;
 
@@ -12,5 +14,30 @@ struct Plant
     public bool tomatosAreSick;
     public bool leavesAreSick;
 
-    public img plantImage;
+    public Sprite plantImage;
+
+    // Indica si esta planta ya fue explorada
+    [HideInInspector]
+    public bool hasBeenExplored = false;
+
+    void Start()
+    {
+        // Generar ID único si no está asignado
+        if (id == 0)
+        {
+            id = gameObject.GetInstanceID();
+        }
+    }
+
+    // Determina si la planta está completamente sana
+    public bool IsHealthy()
+    {
+        return !plantIsSick && !tomatosAreSick && !leavesAreSick;
+    }
+
+    // Determina si la planta tiene alguna enfermedad
+    public bool IsSick()
+    {
+        return plantIsSick || tomatosAreSick || leavesAreSick;
+    }
 }
