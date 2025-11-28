@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a22aec07c164db643a1952b53072a68a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185414
+  packageName: Delivery Robot
+  packageVersion: 1.0
+  assetPath: Assets/Delivery Robot/Materials/Standard/Robot_Blue.mat
+  uploadId: 407310

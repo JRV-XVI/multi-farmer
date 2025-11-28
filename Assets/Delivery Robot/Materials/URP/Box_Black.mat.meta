@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 316b7987d57ba13499f524d018a8883d
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185414
+  packageName: Delivery Robot
+  packageVersion: 1.0
+  assetPath: Assets/Delivery Robot/Materials/URP/Box_Black.mat
+  uploadId: 407310
