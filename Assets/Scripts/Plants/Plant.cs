@@ -10,7 +10,6 @@ public class Plant : MonoBehaviour
     //Datos de peso para recolector y purgador
     public float plantWeight;
     public float tomatosWeight;
-    public int tomatosNumber;
 
     public bool isCollected;
 
@@ -22,4 +21,29 @@ public class Plant : MonoBehaviour
     public string plantImage;
 
 
+
+
+    public void Start()
+    {
+        GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>().StartPlantValuesRandomly(this);
+        isCollected = false;
+        
+    }
+
+    public float ColectPlant(){
+        float tw = tomatosWeight;
+
+        isCollected = true;
+        tomatosWeight = 0;
+
+        return tw;
+    }
+
+    public float PurgePlant(){
+        float pw = plantWeight;
+
+        gameObject.SetActive(false);
+
+        return pw;
+    }
 }

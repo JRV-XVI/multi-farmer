@@ -16,12 +16,23 @@ public class GameManager : MonoBehaviour
     public float safeZoneMaxCarryWeight = 50f;
     public float trashoneMaxCarryWeight = 50f;
 
+    //Atributos de plantas en escena
+    public float plantWeightMin = 5f; //No asignada aun
+    public float tomatosWeightMin = 2f; //No asignada aun
+
     void Start()
     {
         GameObject recolector = GameObject.FindWithTag("BotRecolector");
         if(recolector == null)
         {
             Debug.LogError("Recolector not found in the scene!!");
+            return;
+        }
+
+        GameObject purgator = GameObject.FindWithTag("BotPurgator");
+        if(purgator == null)
+        {
+            Debug.LogError("Purgator not found in the scene!!");
             return;
         }
 
@@ -44,8 +55,17 @@ public class GameManager : MonoBehaviour
                 Debug.LogError("❌ El GameObject BotRecolector no tiene el componente Recolector!");
                 return;
             }
-            
             recolectorComponent.InitializePlantList(plantsFound);
+            
+
+            Purgator purgatorComponent = purgator.GetComponent<Purgator>();
+            if(purgatorComponent == null)
+            {
+                Debug.LogError("❌ El GameObject BotPurgator no tiene el componente Purgator!");
+                return;
+            }
+            purgatorComponent.InitializePlantList(plantsFound);
+
         }
         else
         {
@@ -207,11 +227,38 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void RefreshPlantsForPurgator()
+    {
+        GameObject purgator = GameObject.FindWithTag("BotPurgator");
+        if(purgator != null)
+        {
+            Purgator purgatorComponent = purgator.GetComponent<Purgator>();
+            if(purgatorComponent != null)
+            {
+                List<GameObject> freshPlants = FindPlantsInScene();
+                purgatorComponent.InitializePlantList(freshPlants);
+            }
+        }
+    }
+
     // Método para obtener plantas válidas disponibles (sin inicializar recolector)
     public List<GameObject> GetValidPlants()
     {
         return FindPlantsInScene();
     }
 
+
+    public void StartPlantValuesRandomly(Plant plant)
+    {
+        //Aun no se hace nada random!!
+        plant.plantWeight = plantWeightMin;
+        plant.tomatosWeight = tomatosWeightMin;
+
+        plant.plantIsSick = false;
+        plant.tomatosAreSick = false;
+        plant.leavesAreSick = false;
+
+        //Y tambien falta asignar la imagen
+    }
 
 }

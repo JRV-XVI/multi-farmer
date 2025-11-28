@@ -11,7 +11,6 @@ public class Zone : MonoBehaviour
     private GameManager _gameManager;
     [SerializeField] private float _maxCarryWeight;
     [SerializeField] private float _currentCarryWeight;
-    [SerializeField] private int _currentThingsNumberDeposited;
 
     public ZoneType zoneType;
 
@@ -45,10 +44,9 @@ public class Zone : MonoBehaviour
     }
 
     
-    public float DepositeThings(float weight, int number)
+    public float DepositeThings(float weight)
     {
         _currentCarryWeight += weight;
-        _currentThingsNumberDeposited += number;
 
         if(_currentCarryWeight > _maxCarryWeight)
         {

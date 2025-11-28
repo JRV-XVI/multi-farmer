@@ -18,7 +18,6 @@ public class Recolector : MonoBehaviour
 
     [SerializeField] private float _maxCarryWeight;
     [SerializeField] private float _currentCarryWeight;
-    [SerializeField] private int _currentTomatosCollected;
 
 
         //Control de navegación
@@ -213,17 +212,11 @@ public class Recolector : MonoBehaviour
             transform.LookAt(plant.transform);
         }
 
+        // Recolectar la planta
+        float tomatosPlantWeight =plant.GetComponent<Plant>().ColectPlant();
+        _currentCarryWeight += tomatosPlantWeight;
+        
         _trackList.Remove(plant);
-        
-        // Marcar como recolectada antes de desactivar
-        if (plantComponent != null)
-        {
-            plantComponent.isCollected = true;
-            _currentCarryWeight += plantComponent.tomatosWeight;
-            _currentTomatosCollected += plantComponent.tomatosNumber;
-        }
-        
-        plant.SetActive(false);
 
         Debug.Log($"🍅 Recolectado: {plant.name}. Peso actual: {_currentCarryWeight}");
 
@@ -233,10 +226,9 @@ public class Recolector : MonoBehaviour
     private void DownloadWeight()
     {
         Zone safeZone = this.safeZone.GetComponent<Zone>();
-        float exceededWeight = safeZone.DepositeThings(_currentCarryWeight, _currentTomatosCollected);
+        float exceededWeight = safeZone.DepositeThings(_currentCarryWeight);
         _currentCarryWeight = exceededWeight;
-        _currentTomatosCollected = 0;
-
+        
         Debug.Log($"📦 Descargado en zona segura. Peso restante: {_currentCarryWeight}");
 
         TrackNextObject();
