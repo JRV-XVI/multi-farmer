@@ -161,19 +161,25 @@ public class Recolector : MonoBehaviour
 
         Vector3 destination;
         
-        // Buscar si tiene un componente Plant (que debería ser MonoBehaviour)
-        Plant plantComponent = target.GetComponent<Plant>();
-        if (plantComponent != null)
+        //checar que tipo de objeto es el target
+        if (target.tag == "Plant")
         {
             // Buscar el punto de acceso
-            Transform accessPoint = plantComponent.puntoDeAcceso;
+            Transform accessPoint = target.GetComponent<Plant>().puntoDeAcceso;
             destination = accessPoint != null ? accessPoint.position : target.transform.position;
             Debug.Log($"🌱 Navegando hacia planta con punto de acceso: {accessPoint != null}");
         }
+        else if (target.tag == "Zone" && target.GetComponent<Zone>().zoneType == ZoneType.SafeZone)
+        {
+            // Buscar el punto de acceso
+            Transform accessPoint = target.GetComponent<Zone>().puntoDeAcceso;
+            destination = accessPoint != null ? accessPoint.position : target.transform.position;
+            Debug.Log($"🏠 Navegando hacia objetivo sin componente Plant");
+        }
         else
         {
+            Debug.LogWarning($"⚠️ Target con tag inesperado: {target.tag}. Usando posición directa.");
             destination = target.transform.position;
-            Debug.Log($"🏠 Navegando hacia objetivo sin componente Plant");
         }
 
         Debug.Log($"🗺️ Destino calculado: {destination}");
@@ -181,7 +187,7 @@ public class Recolector : MonoBehaviour
         bool pathSet = _navMeshAgent.SetDestination(destination);
         if (pathSet)
         {
-            Debug.Log($"🤖 Navegando hacia: {target.name} - Path establecido correctamente");
+            Debug.Log($"🤖 Navegando hacia: {target.name} - {target.transform.position} - Path establecido correctamente");
             _hasArrived = false;
             _isMoving = true;
         }

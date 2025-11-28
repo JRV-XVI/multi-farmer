@@ -1,5 +1,11 @@
 using UnityEngine;
 
+public enum ZoneType
+{
+    SafeZone,
+    TrashZone
+}
+
 public class Zone : MonoBehaviour
 {
     private GameManager _gameManager;
@@ -7,7 +13,9 @@ public class Zone : MonoBehaviour
     [SerializeField] private float _currentCarryWeight;
     [SerializeField] private int _currentThingsNumberDeposited;
 
-    public bool isSafeZoneForRecolector;
+    public ZoneType zoneType;
+
+    public Transform puntoDeAcceso; 
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -20,12 +28,17 @@ public class Zone : MonoBehaviour
         }
 
 
-        if( isSafeZoneForRecolector)
+        if( zoneType == ZoneType.SafeZone)
         {
             _maxCarryWeight = _gameManager.safeZoneMaxCarryWeight;
-        } else
+        } 
+        else if (zoneType == ZoneType.TrashZone)
         {
             _maxCarryWeight = _gameManager.trashoneMaxCarryWeight;
+        } 
+        else
+        {
+            Debug.LogError("Zone type not set correctly!!");
         }
         _currentCarryWeight = 0f;
 
@@ -47,3 +60,4 @@ public class Zone : MonoBehaviour
         
     }
 }
+
