@@ -4,7 +4,12 @@
 TagManager:
   serializedVersion: 3
   tags:
+  - GameManager
   - Plant
+  - Zone
+  - BotRecolector
+  - BotPurgator
+  - BotExplorer
   layers:
   - Default
   - TransparentFX

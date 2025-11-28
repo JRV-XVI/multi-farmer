@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Purgador : MonoBehaviour
+public class Purgator : MonoBehaviour
 {
     private GameManager _gameManager;
     
@@ -75,7 +75,7 @@ public class Purgador : MonoBehaviour
         plant.SetActive(false);
 
         _currentCarryWeight += plant.GetComponent<Plant>().plantWeight;
-        _currentTomatosCollected += plant.GetComponent<Plant>().tomatosNumber;
+        _currentPlantsCollected += 1;
 
         TrackNextObject();
 
@@ -84,8 +84,8 @@ public class Purgador : MonoBehaviour
     private void DownloadWeight()
     {
         Zone safeZone = zone.GetComponent<Zone>();
-        float exceededWeight = safeZone.DepositeTomatos(_currentCarryWeight, _currentTomatosCollected);
+        float exceededWeight = safeZone.DepositeThings(_currentCarryWeight, _currentPlantsCollected);
         _currentCarryWeight = exceededWeight;
-        _currentTomatosCollected = 0;
+        _currentPlantsCollected = 0;
     }
 }

@@ -137,7 +137,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0.5, z: 0}
---- !u!114 &6831187981917689122
+--- !u!114 &3421369825636438894
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -146,10 +146,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 2093769729472936836}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 53cd8ca180df7bd4b87e0ed687504dec, type: 3}
+  m_Script: {fileID: 11500000, guid: ce299b57fd65b2e5ba43d5aa2ff1e802, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlantaDeTomate
+  m_EditorClassIdentifier: Assembly-CSharp::Plant
+  id: 0
   puntoDeAcceso: {fileID: 2508503208287918742}
+  plantWeight: 20
+  tomatosWeight: 2
+  tomatosNumber: 2
+  isCollected: 0
+  plantIsSick: 0
+  tomatosAreSick: 0
+  leavesAreSick: 0
+  plantImage: 
 --- !u!1 &2137113829345353100
 GameObject:
   m_ObjectHideFlags: 0
