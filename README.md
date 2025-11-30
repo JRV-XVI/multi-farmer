@@ -139,10 +139,13 @@ Funciona bajo una arquitectura **reactiva con alta prioridad de seguridad**, gar
 
 ## 📚 Aprendizaje Adquirido Del Equipo
 
-Durante esta fase del proyecto, nuestro equipo consolidó conocimientos clave relacionados con el modelado de sistemas multiagente y la estructuración del mundo virtual para la simulación 3D. Logramos comprender cómo definir claramente los roles de cada agente, sus interacciones y los subsistemas internos que les permiten ejecutar comportamientos complejos dentro del entorno simulado.
+Durante esta fase del proyecto, el equipo fortaleció su comprensión sobre la construcción de sistemas multiagente y la integración de estos dentro de un entorno 3D simulado. A través del diseño y análisis de los diferentes agentes —Recolector, Purgador, Manager y Explorer— aprendimos a definir sus responsabilidades, estructuras internas, protocolos de comunicación y los procesos que guían su comportamiento dentro del invernadero virtual.
 
-Aprendimos a emplear diferentes diagramas UML (clases, interacción, actividades y estados) para representar de manera formal y precisa la arquitectura del sistema. Esto nos permitió mejorar la comunicación interna del equipo y facilitar el entendimiento del flujo de operaciones entre agentes.
+El uso de herramientas de modelado como diagramas de clases, diagramas de interacción (AIP) y diagramas de actividad, permitió representar de manera clara las funciones, flujos de información y dinámicas del sistema. Este proceso no solo facilitó la comprensión del funcionamiento de cada agente, sino que también mejoró la comunicación interna del equipo y la planificación del sistema completo.
 
+Además, adquirimos experiencia en la configuración del entorno virtual, seleccionando prefabs, texturas y modelos adecuados para construir un escenario coherente y funcional dentro de Unity. Esto reforzó nuestra capacidad para integrar aspectos visuales, lógicos y estructurales en una misma simulación.
+
+En conjunto, estos aprendizajes consolidaron las bases necesarias para diseñar un sistema multiagente robusto, coordinado y adaptable dentro de un entorno dinámico.
 ---
 
 📅 **Versión del documento:** v1.0  
