@@ -139,7 +139,7 @@ Funciona bajo una arquitectura **reactiva con alta prioridad de seguridad**, gar
 
 ## 📚 Aprendizaje Adquirido Del Equipo
 
-Durante esta fase del proyecto, el equipo fortaleció su comprensión sobre la construcción de sistemas multiagente y la integración de estos dentro de un entorno 3D simulado. A través del diseño y análisis de los diferentes agentes —Recolector, Purgador, Manager y Explorer— aprendimos a definir sus responsabilidades, estructuras internas, protocolos de comunicación y los procesos que guían su comportamiento dentro del invernadero virtual.
+Durante esta fase del proyecto, el equipo fortaleció su comprensión sobre la construcción de sistemas multiagente y la integración de estos dentro de un entorno 3D simulado. A través del diseño y análisis de los diferentes agentes (Recolector, Purgador, Manager y Explorer) aprendimos a definir sus responsabilidades, estructuras internas, protocolos de comunicación y los procesos que guían su comportamiento dentro del invernadero virtual.
 
 El uso de herramientas de modelado como diagramas de clases, diagramas de interacción (AIP) y diagramas de actividad, permitió representar de manera clara las funciones, flujos de información y dinámicas del sistema. Este proceso no solo facilitó la comprensión del funcionamiento de cada agente, sino que también mejoró la comunicación interna del equipo y la planificación del sistema completo.
 
@@ -149,5 +149,5 @@ En conjunto, estos aprendizajes consolidaron las bases necesarias para diseñar 
 ---
 
 📅 **Versión del documento:** v1.0  
-✏️ **Última actualización:** 10/11/2025  
+✏️ **Última actualización:** 29/11/2025  
 👨‍💻 **Equipo:** Nightgaunts
