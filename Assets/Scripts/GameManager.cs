@@ -2,23 +2,38 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
 
+
+
 public class GameManager : MonoBehaviour
 {
-    //Atributos de los recolectores
+    [Header("Recolectores")]
     public float recolectorDistanceToCollect = 0.5f;
     public float recolectorMaxCarryWeight = 10f;
 
-    //Atributos de los purgadores
+    [Header("Purgadores")]
     public float purgatorDistanceToDeposit = 0.5f;
     public float purgatorMaxCarryWeight = 10f;
 
-    //Atributos de las Zones
+    [Header("Zones")]
     public float safeZoneMaxCarryWeight = 50f;
     public float trashoneMaxCarryWeight = 50f;
 
-    //Atributos de plantas en escena
-    public float plantWeightMin = 5f; //No asignada aun
-    public float tomatosWeightMin = 2f; //No asignada aun
+    [Header("Plantas en escena")]
+    public float plantMinWeight = 5f;
+    public float plantMaxWeight = 20f;
+    public float tomatoesMinWeight = 2f;
+    public float tomatoesMaxWeight = 5f;
+
+    [Header("Margen de enfermedad de planta")]
+    [Tooltip("Máximo porcentaje de enfermedad para considerar saludable (0.0 - 1.0)")]
+    public float plantMaxStemSickPercentage = 0.3f;
+    public float plantMaxTomatoesSickPercentage = 0.3f;
+    public float plantMaxLeavesSickPercentage = 0.3f;
+
+    [Tooltip("Probabilidad de enfermarse por cosecha (0.0 - 1.0)")]
+    public float plantStemSickChancePerHarvest = 0.1f;
+    public float plantTomatoesSickChancePerHarvest = 0.1f;
+    public float plantLeavesSickChancePerHarvest = 0.1f;
 
     void Start()
     {
@@ -250,13 +265,27 @@ public class GameManager : MonoBehaviour
 
     public void StartPlantValuesRandomly(Plant plant)
     {
-        //Aun no se hace nada random!!
-        plant.plantWeight = plantWeightMin;
-        plant.tomatosWeight = tomatosWeightMin;
+        //Asigancion de valroes de forma random
+        plant.plantWeight = Random.Range(plantMinWeight, plantMaxWeight);
+        plant.tomatosWeight = Random.Range(tomatoesMinWeight, tomatoesMaxWeight);
 
-        plant.plantIsSick = false;
-        plant.tomatosAreSick = false;
-        plant.leavesAreSick = false;
+        //Valoeres de enfermedad
+        if (Random.Range(0f, 1f) < plantStemSickChancePerHarvest)
+            plant.stemSickPercentage = Random.Range(plantMaxStemSickPercentage, 1f);
+        else
+            plant.stemSickPercentage = Random.Range(0f, plantMaxStemSickPercentage);
+
+        if (Random.Range(0f, 1f) < plantTomatoesSickChancePerHarvest)
+            plant.tomatoesSickPercentage = Random.Range(plantMaxTomatoesSickPercentage, 1f);
+        else
+            plant.tomatoesSickPercentage = Random.Range(0f, plantMaxTomatoesSickPercentage);
+
+        if (Random.Range(0f, 1f) < plantLeavesSickChancePerHarvest)
+            plant.leavesSickPercentage = Random.Range(plantMaxLeavesSickPercentage, 1f);
+        else
+            plant.leavesSickPercentage = Random.Range(0f, plantMaxLeavesSickPercentage);
+
+
 
         //Y tambien falta asignar la imagen
     }

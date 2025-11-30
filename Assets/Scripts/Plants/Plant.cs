@@ -14,9 +14,9 @@ public class Plant : MonoBehaviour
     public bool isCollected;
 
     //Datos de enfermedad para explorer
-    public bool plantIsSick;
-    public bool tomatosAreSick;
-    public bool leavesAreSick;
+    public float stemSickPercentage;     //0% (0.00f) a 100% (1.00f)
+    public float tomatoesSickPercentage; //0% (0.00f) a 100% (1.00f)
+    public float leavesSickPercentage;   //0% (0.00f) a 100% (1.00f)
 
     public string plantImage;
 

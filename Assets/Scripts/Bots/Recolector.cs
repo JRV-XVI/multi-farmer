@@ -6,7 +6,6 @@ public class Recolector : MonoBehaviour
 {
     //Objetos externos
     private GameManager _gameManager;
-
     public GameObject safeZone;
 
     //Componentes internos
@@ -254,6 +253,12 @@ public class Recolector : MonoBehaviour
         return _currentCarryWeight;
     }
 
+    // Método para verificar si puede recolectar más
+    public bool CanCarryMore()
+    {
+        return _currentCarryWeight < _maxCarryWeight;
+    }
+
     // Método para inicializar plantas desde el GameManager
     // Recibe una lista ya filtrada y optimizada por el GameManager
     public void InitializePlantList(List<GameObject> validPlants)
@@ -287,11 +292,6 @@ public class Recolector : MonoBehaviour
         }
     }
 
-    // Método para verificar si puede recolectar más
-    public bool CanCarryMore()
-    {
-        return _currentCarryWeight < _maxCarryWeight;
-    }
 
     // Método para limpiar plantas ya recolectadas de la lista
     public void RefreshAvailablePlants()

@@ -254,6 +254,12 @@ public class Purgator : MonoBehaviour
         return _currentCarryWeight;
     }
 
+    // Método para verificar si puede recolectar más
+    public bool CanCarryMore()
+    {
+        return _currentCarryWeight < _maxCarryWeight;
+    }
+
     // Método para inicializar plantas desde el GameManager
     // Recibe una lista ya filtrada y optimizada por el GameManager
     public void InitializePlantList(List<GameObject> validPlants)
@@ -285,12 +291,6 @@ public class Purgator : MonoBehaviour
         {
             Debug.LogWarning("⚠️ No hay plantas disponibles para recolectar");
         }
-    }
-
-    // Método para verificar si puede recolectar más
-    public bool CanCarryMore()
-    {
-        return _currentCarryWeight < _maxCarryWeight;
     }
 
     // Método para limpiar plantas ya recolectadas de la lista
