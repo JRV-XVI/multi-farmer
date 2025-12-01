@@ -34,7 +34,16 @@ public class Manager : MonoBehaviour
         
     }
 
-    public void AddPlantFound(GameObject plant)
+
+    public void AddPlantList(List<GameObject> plants)
+    {
+        foreach (GameObject plant in plants)
+        {
+            AddPlantFoundToList(plant);
+        }
+    }
+
+    public void AddPlantFoundToList(GameObject plant)
     {
         _plantsFoundCount = _plantsFoundList.Count;
         if (plant.GetComponent<Plant>() == false)

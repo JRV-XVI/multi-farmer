@@ -5,15 +5,17 @@ public class Plant : MonoBehaviour
     public int id;
 
     [Header("Arrastra aquí el hijo 'PuntoInteraccion'")]
-    public Transform puntoDeAcceso; 
+    public Transform puntoDeAcceso;
 
     //Datos de peso para recolector y purgador
+    [Header("Datos de recolección")]
     public float plantWeight;
     public float tomatosWeight;
 
     public bool isCollected;
 
     //Datos de enfermedad para explorer
+    [Header("Datos de enfermedad")]
     public float stemSickPercentage;     //0% (0.00f) a 100% (1.00f)
     public float tomatoesSickPercentage; //0% (0.00f) a 100% (1.00f)
     public float leavesSickPercentage;   //0% (0.00f) a 100% (1.00f)
