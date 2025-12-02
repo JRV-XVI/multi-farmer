@@ -123,7 +123,7 @@ GameObject:
   - component: {fileID: 5815231528839224752}
   m_Layer: 0
   m_Name: TomatoesBox
-  m_TagString: Untagged
+  m_TagString: SafeZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

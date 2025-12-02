@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -25,20 +26,38 @@ public class Manager : MonoBehaviour
         _plantsFoundList = new List<GameObject>();
         _healtyPlantFoundList = new List<GameObject>();
         _sickPlantFoundList = new List<GameObject>();
+
+        _gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
+
+        if(_gameManager == null)
+        {
+            Debug.LogError("GameManager not found in the scene!!");
+        }
     }
 
     void Start()
     {
-        _gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
 
-        FindRecolectorsInZones();
-        FindPurgatorsInZone();
+        
+
     }
 
     void Update()
     {
         
     }
+
+    public void AnalizePlants(List<GameObject> plantsList)
+    {
+        Debug.Log($"🌱 Analizando lista de plantas recibida con {plantsList.Count} plantas.");
+        AddPlantList(plantsList);
+
+        FindRecolectorsInZones();
+        FindPurgatorsInZone();
+
+        AsignPlantsToZone();
+    }
+
 
     public void AddPlantList(List<GameObject> plants)
     {
@@ -92,8 +111,10 @@ public class Manager : MonoBehaviour
 
     private void FindRecolectorsInZones()
     {
-        List<GameObject> zones = new List<GameObject>(GameObject.FindGameObjectsWithTag("Zone"));
-        List<GameObject> recolectors = new List<GameObject>(GameObject.FindGameObjectsWithTag("Recolector"));
+        List<GameObject> zones = new List<GameObject>(GameObject.FindGameObjectsWithTag("SafeZone"));
+        List<GameObject> recolectors = new List<GameObject>(GameObject.FindGameObjectsWithTag("BotRecolector"));
+
+        Debug.Log($"🔍 Buscando recolectores en {zones.Count} zonas.");
 
         // Inicializar la matriz con el tamaño del número de zonas
         _recolectorsInZones = new GameObject[zones.Count][];
@@ -132,6 +153,12 @@ public class Manager : MonoBehaviour
 
             // Guardamos el arreglo de recolectores en la posición correspondiente
             _recolectorsInZones[i] = recolectorsInZone.ToArray();
+
+            // Log de los recolectores asignados a la zona
+            foreach (GameObject recolector in _recolectorsInZones[i])
+            {
+                Debug.Log($"✅ Recolector {recolector.name} asignado a zona {zone.name}.");
+            }
         }
     }
 
@@ -140,8 +167,8 @@ public class Manager : MonoBehaviour
 
     private void FindPurgatorsInZone()
     {
-        List<GameObject> zones = new List<GameObject>(GameObject.FindGameObjectsWithTag("Zone"));
-        List<GameObject> purgators = new List<GameObject>(GameObject.FindGameObjectsWithTag("Purgator"));
+        List<GameObject> zones = new List<GameObject>(GameObject.FindGameObjectsWithTag("TrashZone"));
+        List<GameObject> purgators = new List<GameObject>(GameObject.FindGameObjectsWithTag("BotPurgator"));
 
         // Inicializar la matriz con el tamaño del número de zonas
         _purgatorsInZones = new GameObject[zones.Count][];
@@ -150,7 +177,7 @@ public class Manager : MonoBehaviour
         {
             GameObject zone = zones[i];
 
-            // Lista temporal para recolectores que pertenecen a esta zona
+            // Lista temporal para purgadores que pertenecen a esta zona
             List<GameObject> purgatorInZones = new List<GameObject>();
 
             foreach (GameObject purgatorObj in purgators)
@@ -167,20 +194,86 @@ public class Manager : MonoBehaviour
                 GameObject purgatorTrashZone = purgatorComp.TrashZone;
                 if (purgatorTrashZone == null)
                 {
-                    // Recolector no tiene asignada zona segura
+                    // Purgador no tiene asignada zona segura
                     continue;
                 }
 
-                // Si la zona segura del recolector es la zona actual, lo añadimos
+                // Si la zona segura del purgador es la zona actual, lo añadimos
                 if (purgatorTrashZone == zone)
                 {
                     purgatorInZones.Add(purgatorObj);
                 }
             }
 
-            // Guardamos el arreglo de recolectores en la posición correspondiente
+            // Guardamos el arreglo de purgadores en la posición correspondiente
             _purgatorsInZones[i] = purgatorInZones.ToArray();
+
+            // Log de los pugadores asignados a la zona
+            foreach (GameObject purgator in _purgatorsInZones[i])
+            {
+                Debug.Log($"✅ Purgator {purgator.name} asignado a zona {zone.name}.");
+            }
         }
     }
+
+
+    public void AsignPlantsToZone()
+    {
+        AsignHealtyPlantToZone();
+    }
+
+
+    private void AsignHealtyPlantToZone()
+    {
+        // Crear listas vacias por zona
+        List<GameObject>[] plantsForZone = new List<GameObject>[_recolectorsInZones.Length];
+
+        for (int i = 0; i < plantsForZone.Length; i++)
+        {
+            plantsForZone[i] = new List<GameObject>();
+        }
+
+        Debug.Log($"🌱 Asignando {_healtyPlantFoundList.Count} plantas saludables a zonas de recolectores.");
+
+        // Recorrer todas las plantas
+        foreach (GameObject plant in _healtyPlantFoundList)
+        {
+            float minDist = Mathf.Infinity;
+            int closestZone = -1;
+
+            // Buscar zona mas cercana
+            for (int i = 0; i < _recolectorsInZones.Length; i++)
+            {
+                Debug.Log($"🔍 Evaluando zona {i} para planta {plant.name}. Zona tiene {_purgatorsInZones[i].Length}");
+                if (_purgatorsInZones[i].Length == 0)
+                    continue;
+
+                float dist = (plant.transform.position - _recolectorsInZones[i][0].transform.position).sqrMagnitude;
+
+                if (dist < minDist)
+                {
+                    minDist = dist;
+                    closestZone = i;
+                }
+            }
+
+            // Agregar planta a la zona encontrada
+            if (closestZone != -1)
+            {
+                plantsForZone[closestZone].Add(plant);
+            }
+        }
+
+        // Aqui ya tienes todas las plantas ordenadas por zona
+
+        int index = 0;
+        foreach (var zonePlants in plantsForZone)
+        {
+            //Debug.Log($"Zona {_purgatorsInZones[zonePlants.IndexOf][0].GetComponent<Recolector>().safeZone.name} tiene {zonePlants.Count} plantas asignadas.");
+            Debug.Log($"Zona {index} tiene {zonePlants.Count} plantas asignadas.");
+            index++;
+        }
+    }
+
 
 }

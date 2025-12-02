@@ -66,6 +66,7 @@ public class Recolector : MonoBehaviour
     {
         CheckNavigationStatus();
         
+        /*
         // Debug temporal para monitorear estado
         if (_currentTrack != null && _navMeshAgent != null && Time.frameCount % 60 == 0) // Solo cada segundo aprox
         {
@@ -73,6 +74,7 @@ public class Recolector : MonoBehaviour
                      $"RemainingDistance={_navMeshAgent.remainingDistance:F2}, " +
                      $"Target={_currentTrack.name}");
         }
+        */
     }
 
     // Método mejorado basado en RobotPrueba para detectar llegada

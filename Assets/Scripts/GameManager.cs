@@ -92,6 +92,8 @@ public class GameManager : MonoBehaviour
                 recolectorComponent.InitializePlantList(new List<GameObject>());
             }
         }
+
+        GameObject.FindGameObjectWithTag("BotManager").GetComponent<Manager>().AnalizePlants(plantsFound);
     }
 
     // Update is called once per frame
@@ -100,7 +102,7 @@ public class GameManager : MonoBehaviour
         
     }
 
-    List<GameObject> FindPlantsInScene()
+    public List<GameObject> FindPlantsInScene()
     {
         GameObject[] plantsArray = GameObject.FindGameObjectsWithTag("Plant");
         
@@ -109,8 +111,9 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("⚠️ No se encontraron GameObjects con tag 'Plant'");
             
             // Buscar alternativamente por componente Plant
-            Plant[] plantComponents = FindObjectsOfType<Plant>();
-            if(plantComponents != null && plantComponents.Length > 0)
+            Plant[] plantComponents = Object.FindObjectsOfType<Plant>();
+            
+            if (plantComponents != null && plantComponents.Length > 0)
             {
                 Debug.Log($"🔍 Se encontraron {plantComponents.Length} objetos con componente Plant");
                 return FilterValidPlants(plantComponents);

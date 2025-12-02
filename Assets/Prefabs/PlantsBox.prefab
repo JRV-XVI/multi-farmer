@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6904735956185945756}
   m_Layer: 0
   m_Name: PlantsBox
-  m_TagString: Untagged
+  m_TagString: TrashZone
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
