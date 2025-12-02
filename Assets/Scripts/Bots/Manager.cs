@@ -4,12 +4,23 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
+[System.Serializable]
+public struct ZoneInfo
+{
+    public GameObject zone;
+    public List<GameObject> botsInZone;
+    public List<GameObject> plantsInZone;
+}
+
 public class Manager : MonoBehaviour
 {
     private GameManager _gameManager;
 
+    [SerializeField]
     private List<GameObject> _plantsFoundList;
+    [SerializeField]
     private List<GameObject> _healtyPlantFoundList;
+    [SerializeField]
     private List<GameObject> _sickPlantFoundList;
 
     private int _plantsFoundCount;
@@ -17,9 +28,7 @@ public class Manager : MonoBehaviour
     private int _healtyPlantFoundCount;
 
     [SerializeField]
-    public GameObject[][] _recolectorsInZones; // [Zona][Recolector]
-    [SerializeField]
-    public GameObject[][] _purgatorsInZones; // [Zona][Purgator]
+    private List<ZoneInfo> _zonesInfo;   // <--- AHORA SOLO ESTO MANEJA TODO
 
     void Awake()
     {
@@ -27,35 +36,98 @@ public class Manager : MonoBehaviour
         _healtyPlantFoundList = new List<GameObject>();
         _sickPlantFoundList = new List<GameObject>();
 
+        _zonesInfo = new List<ZoneInfo>();
+
         _gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
 
-        if(_gameManager == null)
+        if (_gameManager == null)
         {
             Debug.LogError("GameManager not found in the scene!!");
         }
     }
 
-    void Start()
-    {
-
-        
-
-    }
-
-    void Update()
-    {
-        
-    }
-
     public void AnalizePlants(List<GameObject> plantsList)
     {
-        Debug.Log($"🌱 Analizando lista de plantas recibida con {plantsList.Count} plantas.");
+        Debug.Log($"Analizando lista de plantas recibida con {plantsList.Count} plantas.");
         AddPlantList(plantsList);
 
-        FindRecolectorsInZones();
-        FindPurgatorsInZone();
+        BuildZonesInfo();        // <--- Construye la lista de ZoneInfo
+        AsignPlantsToZones();    // <--- Usa ZoneInfo.plantsInZone
+    }
 
-        AsignPlantsToZone();
+    private void BuildZonesInfo()
+    {
+        _zonesInfo.Clear();
+
+        // 1. Encontrar todas las zonas y bots
+        List<GameObject> safeZones = new List<GameObject>(GameObject.FindGameObjectsWithTag("SafeZone"));
+        List<GameObject> trashZones = new List<GameObject>(GameObject.FindGameObjectsWithTag("TrashZone"));
+
+        List<GameObject> recolectors = new List<GameObject>(GameObject.FindGameObjectsWithTag("BotRecolector"));
+        List<GameObject> purgators = new List<GameObject>(GameObject.FindGameObjectsWithTag("BotPurgator"));
+
+        // 2. Crear ZoneInfo por cada zona (SafeZone y TrashZone)
+        foreach (GameObject zone in safeZones)
+        {
+            ZoneInfo z = new ZoneInfo();
+            z.zone = zone;
+            z.botsInZone = new List<GameObject>();
+            z.plantsInZone = new List<GameObject>();
+            _zonesInfo.Add(z);
+        }
+
+        foreach (GameObject zone in trashZones)
+        {
+            ZoneInfo z = new ZoneInfo();
+            z.zone = zone;
+            z.botsInZone = new List<GameObject>();
+            z.plantsInZone = new List<GameObject>();
+            _zonesInfo.Add(z);
+        }
+
+        // 3. Asignar bots recolectores a SafeZones
+        foreach (GameObject bot in recolectors)
+        {
+            if (bot == null) continue;
+
+            Recolector comp = bot.GetComponent<Recolector>();
+            if (comp == null) continue;
+            if (comp.safeZone == null) continue;
+
+            foreach (var zone in _zonesInfo)
+            {
+                if (zone.zone == comp.safeZone)
+                {
+                    zone.botsInZone.Add(bot);
+                    break;
+                }
+            }
+        }
+
+        // 4. Asignar bots purgadores a TrashZones
+        foreach (GameObject bot in purgators)
+        {
+            if (bot == null) continue;
+
+            Purgator comp = bot.GetComponent<Purgator>();
+            if (comp == null) continue;
+            if (comp.TrashZone == null) continue;
+
+            foreach (var zone in _zonesInfo)
+            {
+                if (zone.zone == comp.TrashZone)
+                {
+                    zone.botsInZone.Add(bot);
+                    break;
+                }
+            }
+        }
+
+        // 5. Log de resultado final
+        for (int i = 0; i < _zonesInfo.Count; i++)
+        {
+            Debug.Log($"Zona {i} ({_zonesInfo[i].zone.tag}) tiene {_zonesInfo[i].botsInZone.Count} bots.");
+        }
     }
 
 
@@ -72,13 +144,13 @@ public class Manager : MonoBehaviour
         _plantsFoundCount = _plantsFoundList.Count;
         if (plant.GetComponent<Plant>() == false)
         {
-            Debug.LogWarning($"⚠️ El objeto {plant.name} no tiene componente Plant. No se puede agregar.");
+            Debug.LogWarning($"El objeto {plant.name} no tiene componente Plant. No se puede agregar.");
             return;
         }
 
         if (plant.GetComponent<Plant>().isCollected)
         {
-            Debug.LogWarning($"⚠️ La planta {plant.name} ya ha sido recolectada. No se puede agregar.");
+            Debug.LogWarning($"La planta {plant.name} ya ha sido recolectada. No se puede agregar.");
             return;
         }
 
@@ -94,186 +166,93 @@ public class Manager : MonoBehaviour
 
     private bool PlantIsSick(Plant plant)
     {
-        if (plant.stemSickPercentage > _gameManager.plantMaxStemSickPercentage)
-        {
-            return true;
-        }
-        if(plant.tomatoesSickPercentage > _gameManager.plantMaxTomatoesSickPercentage)
-        {
-            return true;
-        }
-        if(plant.leavesSickPercentage > _gameManager.plantMaxLeavesSickPercentage)
-        {
-            return true;
-        }
+        if (plant.stemSickPercentage > _gameManager.plantMaxStemSickPercentage) return true;
+        if (plant.tomatoesSickPercentage > _gameManager.plantMaxTomatoesSickPercentage) return true;
+        if (plant.leavesSickPercentage > _gameManager.plantMaxLeavesSickPercentage) return true;
         return false;
     }
 
-    private void FindRecolectorsInZones()
+    // ============================================================================================
+    // ASIGNACION DE PLANTAS A ZONAS
+    // ============================================================================================
+
+    private void AsignPlantsToZones()
     {
-        List<GameObject> zones = new List<GameObject>(GameObject.FindGameObjectsWithTag("SafeZone"));
-        List<GameObject> recolectors = new List<GameObject>(GameObject.FindGameObjectsWithTag("BotRecolector"));
-
-        Debug.Log($"🔍 Buscando recolectores en {zones.Count} zonas.");
-
-        // Inicializar la matriz con el tamaño del número de zonas
-        _recolectorsInZones = new GameObject[zones.Count][];
-
-        for (int i = 0; i < zones.Count; i++)
+        // Vaciar plantas en todas las zonas
+        for (int i = 0; i < _zonesInfo.Count; i++)
         {
-            GameObject zone = zones[i];
-
-            // Lista temporal para recolectores que pertenecen a esta zona
-            List<GameObject> recolectorsInZone = new List<GameObject>();
-
-            foreach (GameObject recolectorObj in recolectors)
-            {
-                if (recolectorObj == null) continue;
-
-                Recolector recolectorComp = recolectorObj.GetComponent<Recolector>();
-                if (recolectorComp == null)
-                {
-                    Debug.LogWarning($"⚠️ Objeto {recolectorObj.name} taggeado como Recolector pero sin componente Recolector.");
-                    continue;
-                }
-
-                GameObject recolectorSafeZone = recolectorComp.safeZone;
-                if (recolectorSafeZone == null)
-                {
-                    // Recolector no tiene asignada zona segura
-                    continue;
-                }
-
-                // Si la zona segura del recolector es la zona actual, lo añadimos
-                if (recolectorSafeZone == zone)
-                {
-                    recolectorsInZone.Add(recolectorObj);
-                }
-            }
-
-            // Guardamos el arreglo de recolectores en la posición correspondiente
-            _recolectorsInZones[i] = recolectorsInZone.ToArray();
-
-            // Log de los recolectores asignados a la zona
-            foreach (GameObject recolector in _recolectorsInZones[i])
-            {
-                Debug.Log($"✅ Recolector {recolector.name} asignado a zona {zone.name}.");
-            }
-        }
-    }
-
-
-
-
-    private void FindPurgatorsInZone()
-    {
-        List<GameObject> zones = new List<GameObject>(GameObject.FindGameObjectsWithTag("TrashZone"));
-        List<GameObject> purgators = new List<GameObject>(GameObject.FindGameObjectsWithTag("BotPurgator"));
-
-        // Inicializar la matriz con el tamaño del número de zonas
-        _purgatorsInZones = new GameObject[zones.Count][];
-
-        for (int i = 0; i < zones.Count; i++)
-        {
-            GameObject zone = zones[i];
-
-            // Lista temporal para purgadores que pertenecen a esta zona
-            List<GameObject> purgatorInZones = new List<GameObject>();
-
-            foreach (GameObject purgatorObj in purgators)
-            {
-                if (purgatorObj == null) continue;
-
-                Purgator purgatorComp = purgatorObj.GetComponent<Purgator>();
-                if (purgatorComp == null)
-                {
-                    Debug.LogWarning($"⚠️ Objeto {purgatorObj.name} taggeado como Purgator pero sin componente Purgatos<>.");
-                    continue;
-                }
-
-                GameObject purgatorTrashZone = purgatorComp.TrashZone;
-                if (purgatorTrashZone == null)
-                {
-                    // Purgador no tiene asignada zona segura
-                    continue;
-                }
-
-                // Si la zona segura del purgador es la zona actual, lo añadimos
-                if (purgatorTrashZone == zone)
-                {
-                    purgatorInZones.Add(purgatorObj);
-                }
-            }
-
-            // Guardamos el arreglo de purgadores en la posición correspondiente
-            _purgatorsInZones[i] = purgatorInZones.ToArray();
-
-            // Log de los pugadores asignados a la zona
-            foreach (GameObject purgator in _purgatorsInZones[i])
-            {
-                Debug.Log($"✅ Purgator {purgator.name} asignado a zona {zone.name}.");
-            }
-        }
-    }
-
-
-    public void AsignPlantsToZone()
-    {
-        AsignHealtyPlantToZone();
-    }
-
-
-    private void AsignHealtyPlantToZone()
-    {
-        // Crear listas vacias por zona
-        List<GameObject>[] plantsForZone = new List<GameObject>[_recolectorsInZones.Length];
-
-        for (int i = 0; i < plantsForZone.Length; i++)
-        {
-            plantsForZone[i] = new List<GameObject>();
+            _zonesInfo[i].plantsInZone.Clear();
         }
 
-        Debug.Log($"🌱 Asignando {_healtyPlantFoundList.Count} plantas saludables a zonas de recolectores.");
+        AsignHealtyPlants();
+        AsignSickPlants();
+    }
 
-        // Recorrer todas las plantas
-        foreach (GameObject plant in _healtyPlantFoundList)
+    private void AsignHealtyPlants()
+    {
+        Debug.Log($"Asignando {_healtyPlantFoundList.Count} plantas saludables a zonas.");
+
+        List<ZoneInfo> zones = new List<ZoneInfo>();
+
+        foreach (ZoneInfo zz in _zonesInfo)
+        {
+            if(zz.zone.GetComponent<Zone>().zoneType == ZoneType.SafeZone)
+                zones.Add(zz);
+        }
+
+        AsignPlantToZone2(_healtyPlantFoundList, zones);
+    }
+
+    private void AsignSickPlants()
+    {
+        Debug.Log($"Asignando {_sickPlantFoundList.Count} plantas enfermas a zonas.");
+
+        List<ZoneInfo> zones = new List<ZoneInfo>();
+
+        foreach (ZoneInfo zz in _zonesInfo)
+        {
+            if (zz.zone.GetComponent<Zone>().zoneType == ZoneType.TrashZone)
+                zones.Add(zz);
+        }
+
+        AsignPlantToZone2(_healtyPlantFoundList, zones);
+    }
+
+    private void AsignPlantToZone2(List<GameObject> plants, List<ZoneInfo> zonesInfo)
+    {
+        foreach (GameObject plant in plants)
         {
             float minDist = Mathf.Infinity;
-            int closestZone = -1;
+            int bestZone = -1;
 
-            // Buscar zona mas cercana
-            for (int i = 0; i < _recolectorsInZones.Length; i++)
+            for (int i = 0; i < zonesInfo.Count; i++)
             {
-                Debug.Log($"🔍 Evaluando zona {i} para planta {plant.name}. Zona tiene {_purgatorsInZones[i].Length}");
-                if (_purgatorsInZones[i].Length == 0)
-                    continue;
+                if (zonesInfo[i].botsInZone.Count == 0) continue;
 
-                float dist = (plant.transform.position - _recolectorsInZones[i][0].transform.position).sqrMagnitude;
+                float dist = (plant.transform.position - _zonesInfo[i].zone.transform.position).sqrMagnitude;
 
                 if (dist < minDist)
                 {
                     minDist = dist;
-                    closestZone = i;
+                    bestZone = i;
                 }
             }
 
-            // Agregar planta a la zona encontrada
-            if (closestZone != -1)
+            if (bestZone != -1)
             {
-                plantsForZone[closestZone].Add(plant);
+                _zonesInfo[bestZone].plantsInZone.Add(plant);
             }
         }
 
-        // Aqui ya tienes todas las plantas ordenadas por zona
-
-        int index = 0;
-        foreach (var zonePlants in plantsForZone)
+        // Log final
+        for (int i = 0; i < _zonesInfo.Count; i++)
         {
-            //Debug.Log($"Zona {_purgatorsInZones[zonePlants.IndexOf][0].GetComponent<Recolector>().safeZone.name} tiene {zonePlants.Count} plantas asignadas.");
-            Debug.Log($"Zona {index} tiene {zonePlants.Count} plantas asignadas.");
-            index++;
+            Debug.Log($"Zona {i} tiene {_zonesInfo[i].plantsInZone.Count} plantas asignadas.");
         }
     }
+
+
+
 
 
 }
