@@ -118,18 +118,18 @@ public class Purgator : MonoBehaviour
         if (_trackList.Count > 0 && _currentCarryWeight < _maxCarryWeight)
         {
             _currentTrack = _trackList[0];
-            Debug.Log($"🎯 Objetivo seleccionado: {_currentTrack.name}");
+            //Debug.Log($"🎯 Objetivo seleccionado: {_currentTrack.name}");
         }
         else
         {
             _currentTrack = TrashZone;
-            Debug.Log($"🏠 Dirigiéndose a zona segura: {(_currentTrack != null ? _currentTrack.name : "NULL")}");
+            //Debug.Log($"🏠 Dirigiéndose a zona segura: {(_currentTrack != null ? _currentTrack.name : "NULL")}");
         }
 
         // Navegar al nuevo objetivo si existe
         if (_currentTrack != null)
         {
-            Debug.Log($"🚀 Iniciando navegación hacia: {_currentTrack.name}");
+            //Debug.Log($"🚀 Iniciando navegación hacia: {_currentTrack.name}");
             NavigateToTarget(_currentTrack);
         }
         else
@@ -168,14 +168,14 @@ public class Purgator : MonoBehaviour
             // Buscar el punto de acceso
             Transform accessPoint = target.GetComponent<Plant>().puntoDeAcceso;
             destination = accessPoint != null ? accessPoint.position : target.transform.position;
-            Debug.Log($"🌱 Navegando hacia planta con punto de acceso: {accessPoint != null}");
+            //Debug.Log($"🌱 Navegando hacia planta con punto de acceso: {accessPoint != null}");
         }
         else if (target.tag == "Zone" && target.GetComponent<Zone>().zoneType == ZoneType.TrashZone)
         {
             // Buscar el punto de acceso
             Transform accessPoint = target.GetComponent<Zone>().puntoDeAcceso;
             destination = accessPoint != null ? accessPoint.position : target.transform.position;
-            Debug.Log($"🏠 Navegando hacia objetivo sin componente Plant");
+            //Debug.Log($"🏠 Navegando hacia objetivo sin componente Plant");
         }
         else
         {
@@ -183,12 +183,12 @@ public class Purgator : MonoBehaviour
             destination = target.transform.position;
         }
 
-        Debug.Log($"🗺️ Destino calculado: {destination}");
+        //Debug.Log($"🗺️ Destino calculado: {destination}");
         
         bool pathSet = _navMeshAgent.SetDestination(destination);
         if (pathSet)
         {
-            Debug.Log($"🤖 Navegando hacia: {target.name} - {target.transform.position} - Path establecido correctamente");
+            //Debug.Log($"🤖 Navegando hacia: {target.name} - {target.transform.position} - Path establecido correctamente");
             _hasArrived = false;
             _isMoving = true;
         }
@@ -220,7 +220,7 @@ public class Purgator : MonoBehaviour
         
         _trackList.Remove(plant);
 
-        Debug.Log($"🍅 Recolectado: {plant.name}. Peso actual: {_currentCarryWeight}");
+        //Debug.Log($"🍅 Recolectado: {plant.name}. Peso actual: {_currentCarryWeight}");
 
         TrackNextObject();
     }
@@ -282,7 +282,7 @@ public class Purgator : MonoBehaviour
         _trackList.Clear();
         _trackList.AddRange(validPlants);
         
-        Debug.Log($"🌱 Recolector inicializado con {_trackList.Count} plantas válidas");
+        Debug.Log($"🌱 Purgador {this.name} inicializado con {_trackList.Count} plantas válidas");
         
         // Comenzar con el primer objetivo si hay plantas
         if (_trackList.Count > 0)

@@ -538,7 +538,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1691a854d3aa1358990c274d3cfc836c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Recolector
-  safeZone: {fileID: 1123315021}
+  safeZone: {fileID: 717312514}
   _navMeshAgent: {fileID: 0}
   _currentTrack: {fileID: 0}
   _maxCarryWeight: 10
@@ -953,6 +953,10 @@ PrefabInstance:
       propertyPath: m_TagString
       value: TrashZone
       objectReference: {fileID: 0}
+    - target: {fileID: 6904735956185945756, guid: 0aa8aaea0659217408e388512367568c, type: 3}
+      propertyPath: zoneType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8432347163459285215, guid: 0aa8aaea0659217408e388512367568c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 24
@@ -1110,11 +1114,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1123315021 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8870153550105075206, guid: 9ac5b514df280674cb27248692cf34bd, type: 3}
-  m_PrefabInstance: {fileID: 1955994483}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1274967550
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1574,6 +1573,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7a54e973d18986cfb1f2b7594c9574b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Manager
+  _plantsFoundList: []
+  _healtyPlantFoundList: []
+  _sickPlantFoundList: []
+  _zonesInfo: []
 --- !u!65 &1904583349
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1856,6 +1859,10 @@ PrefabInstance:
     - target: {fileID: 4005861459573126392, guid: 0aa8aaea0659217408e388512367568c, type: 3}
       propertyPath: m_TagString
       value: TrashZone
+      objectReference: {fileID: 0}
+    - target: {fileID: 6904735956185945756, guid: 0aa8aaea0659217408e388512367568c, type: 3}
+      propertyPath: zoneType
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6904735956185945756, guid: 0aa8aaea0659217408e388512367568c, type: 3}
       propertyPath: puntoDeAcceso

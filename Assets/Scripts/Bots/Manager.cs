@@ -23,10 +23,6 @@ public class Manager : MonoBehaviour
     [SerializeField]
     private List<GameObject> _sickPlantFoundList;
 
-    private int _plantsFoundCount;
-    private int _sickPlantFoundCount;
-    private int _healtyPlantFoundCount;
-
     [SerializeField]
     private List<ZoneInfo> _zonesInfo;   // <--- AHORA SOLO ESTO MANEJA TODO
 
@@ -50,6 +46,8 @@ public class Manager : MonoBehaviour
     {
         Debug.Log($"Analizando lista de plantas recibida con {plantsList.Count} plantas.");
         AddPlantList(plantsList);
+
+        Debug.Log($"Se encontraron (Plantas) {_healtyPlantFoundList.Count} saludables y {_sickPlantFoundList.Count} enfermas");
 
         BuildZonesInfo();        // <--- Construye la lista de ZoneInfo
         AsignPlantsToZones();    // <--- Usa ZoneInfo.plantsInZone
@@ -86,6 +84,14 @@ public class Manager : MonoBehaviour
         }
 
         // 3. Asignar bots recolectores a SafeZones
+        /*
+        for (int i = 0; i < _zonesInfo.Count; i++)
+        {
+            if (_zonesInfo[i].botsInZone == null) _zonesInfo[i].botsInZone = new List<GameObject>();
+            if (_zonesInfo[i].plantsInZone == null) _zonesInfo[i].plantsInZone = new List<GameObject>();
+        }
+        */
+
         foreach (GameObject bot in recolectors)
         {
             if (bot == null) continue;
@@ -94,11 +100,11 @@ public class Manager : MonoBehaviour
             if (comp == null) continue;
             if (comp.safeZone == null) continue;
 
-            foreach (var zone in _zonesInfo)
+            for (int i = 0; i < _zonesInfo.Count; i++)
             {
-                if (zone.zone == comp.safeZone)
+                if (_zonesInfo[i].zone == comp.safeZone)
                 {
-                    zone.botsInZone.Add(bot);
+                    _zonesInfo[i].botsInZone.Add(bot);
                     break;
                 }
             }
@@ -113,11 +119,11 @@ public class Manager : MonoBehaviour
             if (comp == null) continue;
             if (comp.TrashZone == null) continue;
 
-            foreach (var zone in _zonesInfo)
+            for (int i = 0; i < _zonesInfo.Count; i++)
             {
-                if (zone.zone == comp.TrashZone)
+                if (_zonesInfo[i].zone == comp.TrashZone)
                 {
-                    zone.botsInZone.Add(bot);
+                    _zonesInfo[i].botsInZone.Add(bot);
                     break;
                 }
             }
@@ -126,7 +132,7 @@ public class Manager : MonoBehaviour
         // 5. Log de resultado final
         for (int i = 0; i < _zonesInfo.Count; i++)
         {
-            Debug.Log($"Zona {i} ({_zonesInfo[i].zone.tag}) tiene {_zonesInfo[i].botsInZone.Count} bots.");
+            Debug.Log($"Zona {_zonesInfo[i].zone.name} tiene {_zonesInfo[i].botsInZone.Count} bots.");
         }
     }
 
@@ -141,7 +147,6 @@ public class Manager : MonoBehaviour
 
     public void AddPlantFoundToList(GameObject plant)
     {
-        _plantsFoundCount = _plantsFoundList.Count;
         if (plant.GetComponent<Plant>() == false)
         {
             Debug.LogWarning($"El objeto {plant.name} no tiene componente Plant. No se puede agregar.");
@@ -186,6 +191,8 @@ public class Manager : MonoBehaviour
 
         AsignHealtyPlants();
         AsignSickPlants();
+
+        AsignPlantsToBots();
     }
 
     private void AsignHealtyPlants()
@@ -196,7 +203,7 @@ public class Manager : MonoBehaviour
 
         foreach (ZoneInfo zz in _zonesInfo)
         {
-            if(zz.zone.GetComponent<Zone>().zoneType == ZoneType.SafeZone)
+            if (zz.zone.GetComponent<Zone>().zoneType == ZoneType.SafeZone)
                 zones.Add(zz);
         }
 
@@ -215,11 +222,13 @@ public class Manager : MonoBehaviour
                 zones.Add(zz);
         }
 
-        AsignPlantToZone2(_healtyPlantFoundList, zones);
+        // FIXED: pass sick plants list (was mistakenly passing healthy list)
+        AsignPlantToZone2(_sickPlantFoundList, zones);
     }
 
     private void AsignPlantToZone2(List<GameObject> plants, List<ZoneInfo> zonesInfo)
     {
+        Debug.Log($"Asignando {plants.Count} plantas a {zonesInfo.Count} zonas.");
         foreach (GameObject plant in plants)
         {
             float minDist = Mathf.Infinity;
@@ -227,9 +236,10 @@ public class Manager : MonoBehaviour
 
             for (int i = 0; i < zonesInfo.Count; i++)
             {
-                if (zonesInfo[i].botsInZone.Count == 0) continue;
+                if (zonesInfo[i].botsInZone == null || zonesInfo[i].botsInZone.Count == 0) continue;
 
-                float dist = (plant.transform.position - _zonesInfo[i].zone.transform.position).sqrMagnitude;
+                // USE the filtered zonesInfo for distance calculation (avoid using _zonesInfo[i])
+                float dist = (plant.transform.position - zonesInfo[i].zone.transform.position).sqrMagnitude;
 
                 if (dist < minDist)
                 {
@@ -240,19 +250,112 @@ public class Manager : MonoBehaviour
 
             if (bestZone != -1)
             {
-                _zonesInfo[bestZone].plantsInZone.Add(plant);
+                GameObject targetZone = zonesInfo[bestZone].zone;
+                for (int j = 0; j < _zonesInfo.Count; j++)
+                {
+                    if (_zonesInfo[j].zone == targetZone)
+                    {
+                        _zonesInfo[j].plantsInZone.Add(plant);
+                        break;
+                    }
+                }
             }
         }
 
         // Log final
         for (int i = 0; i < _zonesInfo.Count; i++)
         {
-            Debug.Log($"Zona {i} tiene {_zonesInfo[i].plantsInZone.Count} plantas asignadas.");
+            Debug.Log($"Zona {_zonesInfo[i].zone.name} tiene {_zonesInfo[i].plantsInZone.Count} plantas asignadas.");
         }
     }
 
+    private void AsignPlantsToBots()
+    {
+        for (int zi = 0; zi < _zonesInfo.Count; zi++)
+        {
+            ZoneInfo zone = _zonesInfo[zi];
 
+            int totalPlants = zone.plantsInZone?.Count ?? 0;
+            int totalBots = zone.botsInZone?.Count ?? 0;
 
+            if (totalPlants == 0 || totalBots == 0)
+            {
+                Debug.Log($"zona {zone.zone.name} tiene {totalBots} bots y {totalPlants} plantas -> nada que asignar.");
+                // Still clear bots' lists to avoid stale assignments
+                foreach (GameObject bot in zone.botsInZone)
+                {
+                    if (bot == null) continue;
+                    if (bot.tag == "BotRecolector")
+                    {
+                        Recolector rc = bot.GetComponent<Recolector>();
+                        if (rc != null) rc.InitializePlantList(new List<GameObject>());
+                    }
+                    else if (bot.tag == "BotPurgator")
+                    {
+                        Purgator pg = bot.GetComponent<Purgator>();
+                        if (pg != null) pg.InitializePlantList(new List<GameObject>());
+                    }
+                }
+                continue;
+            }
+
+            int baseCount = totalPlants / totalBots;
+            int remainder = totalPlants % totalBots;
+
+            Debug.Log($"zona {zone.zone.name} tiene {totalBots} bots y {totalPlants} plantas. base={baseCount} resto={remainder}");
+
+            int startIndex = 0;
+
+            for (int b = 0; b < zone.botsInZone.Count; b++)
+            {
+                GameObject bot = zone.botsInZone[b];
+                if (bot == null) continue;
+
+                int countForBot = baseCount + (remainder > 0 ? 1 : 0);
+                if (remainder > 0) remainder--;
+
+                if (countForBot <= 0)
+                {
+                    // assign empty list to ensure bot internal lists are cleared
+                    if (bot.tag == "BotRecolector")
+                    {
+                        Recolector rc = bot.GetComponent<Recolector>();
+                        if (rc != null) rc.InitializePlantList(new List<GameObject>());
+                    }
+                    else if (bot.tag == "BotPurgator")
+                    {
+                        Purgator pg = bot.GetComponent<Purgator>();
+                        if (pg != null) pg.InitializePlantList(new List<GameObject>());
+                    }
+                    continue;
+                }
+
+                // Ensure we don't go out of bounds
+                int available = Math.Max(0, totalPlants - startIndex);
+                int take = Math.Min(countForBot, available);
+
+                List<GameObject> plantsForBot = new List<GameObject>();
+                if (take > 0)
+                {
+                    plantsForBot = zone.plantsInZone.GetRange(startIndex, take);
+                }
+
+                if (bot.tag == "BotRecolector")
+                {
+                    Recolector rc = bot.GetComponent<Recolector>();
+                    if (rc != null) rc.InitializePlantList(plantsForBot);
+                }
+                else if (bot.tag == "BotPurgator")
+                {
+                    Purgator pg = bot.GetComponent<Purgator>();
+                    if (pg != null) pg.InitializePlantList(plantsForBot);
+                }
+
+                startIndex += take;
+                if (startIndex >= totalPlants) break;
+            }
+        }
+    }
 
 
 }

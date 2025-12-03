@@ -70,7 +70,7 @@ public class GameManager : MonoBehaviour
                 Debug.LogError("❌ El GameObject BotRecolector no tiene el componente Recolector!");
                 return;
             }
-            recolectorComponent.InitializePlantList(plantsFound);
+            //recolectorComponent.InitializePlantList(plantsFound);
             
 
             Purgator purgatorComponent = purgator.GetComponent<Purgator>();
@@ -79,7 +79,7 @@ public class GameManager : MonoBehaviour
                 Debug.LogError("❌ El GameObject BotPurgator no tiene el componente Purgator!");
                 return;
             }
-            purgatorComponent.InitializePlantList(plantsFound);
+            //purgatorComponent.InitializePlantList(plantsFound);
 
         }
         else
@@ -93,6 +93,8 @@ public class GameManager : MonoBehaviour
             }
         }
 
+
+        /// Comenta esto cuando tengas el bot Explorador.
         GameObject.FindGameObjectWithTag("BotManager").GetComponent<Manager>().AnalizePlants(plantsFound);
     }
 
@@ -266,6 +268,10 @@ public class GameManager : MonoBehaviour
     }
 
 
+
+
+
+    //Esto es lo unico que se mantendra del GameManager original
     public void StartPlantValuesRandomly(Plant plant)
     {
         //Asigancion de valroes de forma random
