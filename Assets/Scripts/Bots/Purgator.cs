@@ -7,8 +7,6 @@ public class Purgator : MonoBehaviour
     //Objetos externos
     private GameManager _gameManager;
 
-    public GameObject TrashZone;
-
     //Componentes internos
     [SerializeField] private NavMeshAgent _navMeshAgent;
     
@@ -19,6 +17,8 @@ public class Purgator : MonoBehaviour
     [SerializeField] private float _maxCarryWeight;
     [SerializeField] private float _currentCarryWeight;
 
+    // Posición de inicio para retornar cuando no hay plantas asignadas
+    private Vector3 _homePosition;
 
         //Control de navegación
     private bool _hasArrived = false;
@@ -48,6 +48,9 @@ public class Purgator : MonoBehaviour
         {
             Debug.LogError("GameManager not found in the scene!!");
         }
+
+        // Guardar posición inicial para retornar cuando esté idle
+        _homePosition = transform.position;
 
         // Verificar que el NavMeshAgent se inicializó correctamente
         if(_navMeshAgent == null)
@@ -102,7 +105,7 @@ public class Purgator : MonoBehaviour
         _hasArrived = true;
         _isMoving = false;
 
-        if (_currentTrack == TrashZone)
+        if (_currentTrack != null && _currentTrack.CompareTag("TrashZoneInteract"))
         {
             DownloadWeight();
         }
@@ -119,24 +122,59 @@ public class Purgator : MonoBehaviour
         {
             _currentTrack = _trackList[0];
             //Debug.Log($"🎯 Objetivo seleccionado: {_currentTrack.name}");
-        }
-        else
-        {
-            _currentTrack = TrashZone;
-            //Debug.Log($"🏠 Dirigiéndose a zona segura: {(_currentTrack != null ? _currentTrack.name : "NULL")}");
-        }
-
-        // Navegar al nuevo objetivo si existe
-        if (_currentTrack != null)
-        {
-            //Debug.Log($"🚀 Iniciando navegación hacia: {_currentTrack.name}");
             NavigateToTarget(_currentTrack);
         }
+        else if (_currentCarryWeight > 0)
+        {
+            // Tiene peso que depositar: Buscar la TrashZone más cercana dinámicamente
+            _currentTrack = GetNearestTrashZone();
+            if (_currentTrack != null)
+            {
+                Debug.Log($"🗑️ Purgador dirigiéndose a zona de basura más cercana: {_currentTrack.name}");
+                NavigateToTarget(_currentTrack);
+            }
+            else
+            {
+                Debug.LogError("⚠️ No se encontraron TrashZones con tag 'TrashZoneInteract'. Asegúrate de que existan zonas con este tag.");
+                _isMoving = false;
+            }
+        }
         else
         {
-            Debug.LogWarning("⚠️ No hay objetivo disponible para navegar");
-            _isMoving = false;
+            // Sin plantas asignadas y sin peso: Retornar a posición inicial
+            Debug.Log($"🏡 Purgador retornando a posición inicial (sin plantas asignadas)");
+            _currentTrack = null;
+            NavigateToPosition(_homePosition);
         }
+    }
+
+    // NUEVO: Encuentra la TrashZone más cercana al Purgador
+    private GameObject GetNearestTrashZone()
+    {
+        GameObject[] trashZones = GameObject.FindGameObjectsWithTag("TrashZoneInteract");
+        
+        if (trashZones.Length == 0)
+        {
+            Debug.LogWarning("⚠️ No se encontraron TrashZones con tag 'TrashZoneInteract'");
+            return null;
+        }
+
+        GameObject nearest = null;
+        float minDistance = Mathf.Infinity;
+
+        foreach (GameObject zone in trashZones)
+        {
+            if (zone == null) continue;
+
+            float distance = Vector3.Distance(transform.position, zone.transform.position);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                nearest = zone;
+            }
+        }
+
+        return nearest;
     }
 
     // Nuevo método inspirado en RobotPrueba
@@ -199,6 +237,34 @@ public class Purgator : MonoBehaviour
         }
     }
 
+    // Navegar directamente a una posición (para retornar a home)
+    private void NavigateToPosition(Vector3 position)
+    {
+        if (_navMeshAgent == null)
+        {
+            Debug.LogError("❌ NavMeshAgent es null!");
+            return;
+        }
+        
+        if (!_navMeshAgent.isOnNavMesh)
+        {
+            Debug.LogWarning("⚠️ El purgador no está en el NavMesh!");
+            return;
+        }
+
+        bool pathSet = _navMeshAgent.SetDestination(position);
+        if (pathSet)
+        {
+            _hasArrived = false;
+            _isMoving = true;
+        }
+        else
+        {
+            Debug.LogWarning($"⚠️ No se pudo establecer el path hacia la posición: {position}");
+            _isMoving = false;
+        }
+    }
+
 
     private void PurgePlant(GameObject plant)
     {
@@ -227,7 +293,19 @@ public class Purgator : MonoBehaviour
 
     private void DownloadWeight()
     {
-        Zone trashZone = this.TrashZone.GetComponent<Zone>();
+        if (_currentTrack == null)
+        {
+            Debug.LogError("⚠️ No se puede descargar peso: _currentTrack es null");
+            return;
+        }
+
+        Zone trashZone = _currentTrack.GetComponent<Zone>();
+        if (trashZone == null)
+        {
+            Debug.LogError("⚠️ El objeto actual no tiene componente Zone");
+            return;
+        }
+
         float exceededWeight = trashZone.DepositeThings(_currentCarryWeight);
         _currentCarryWeight = exceededWeight;
 
@@ -242,6 +320,14 @@ public class Purgator : MonoBehaviour
         if (plant != null && !_trackList.Contains(plant))
         {
             _trackList.Add(plant);
+            Debug.Log($"📋 Purgador {gameObject.name} recibió planta: {plant.name}. Total en lista: {_trackList.Count}");
+            
+            // NUEVO: Si el bot está idle (no moviéndose), iniciar movimiento inmediatamente
+            if (!_isMoving && _currentTrack == null)
+            {
+                Debug.Log($"🚀 Purgador {gameObject.name} disponible, iniciando movimiento...");
+                TrackNextObject();
+            }
         }
     }
 

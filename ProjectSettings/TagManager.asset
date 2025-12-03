@@ -13,6 +13,8 @@ TagManager:
   - TrashZone
   - Pilar
   - BotManager
+  - SafeZoneInteract
+  - TrashZoneInteract
   layers:
   - Default
   - TransparentFX

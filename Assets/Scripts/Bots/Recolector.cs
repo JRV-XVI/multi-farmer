@@ -6,7 +6,6 @@ public class Recolector : MonoBehaviour
 {
     //Objetos externos
     private GameManager _gameManager;
-    public GameObject safeZone;
 
     //Componentes internos
     [SerializeField] private NavMeshAgent _navMeshAgent;
@@ -18,6 +17,8 @@ public class Recolector : MonoBehaviour
     [SerializeField] private float _maxCarryWeight;
     [SerializeField] private float _currentCarryWeight;
 
+    // Posición de inicio para retornar cuando no hay plantas asignadas
+    private Vector3 _homePosition;
 
         //Control de navegación
     private bool _hasArrived = false;
@@ -47,6 +48,9 @@ public class Recolector : MonoBehaviour
         {
             Debug.LogError("GameManager not found in the scene!!");
         }
+
+        // Guardar posición inicial para retornar cuando esté idle
+        _homePosition = transform.position;
 
         // Verificar que el NavMeshAgent se inicializó correctamente
         if(_navMeshAgent == null)
@@ -101,7 +105,7 @@ public class Recolector : MonoBehaviour
         _hasArrived = true;
         _isMoving = false;
 
-        if (_currentTrack == safeZone)
+        if (_currentTrack != null && _currentTrack.CompareTag("SafeZoneInteract"))
         {
             DownloadWeight();
         }
@@ -118,24 +122,59 @@ public class Recolector : MonoBehaviour
         {
             _currentTrack = _trackList[0];
             //Debug.Log($"🎯 Objetivo seleccionado: {_currentTrack.name}");
-        }
-        else
-        {
-            _currentTrack = safeZone;
-            //Debug.Log($"🏠 Dirigiéndose a zona segura: {(_currentTrack != null ? _currentTrack.name : "NULL")}");
-        }
-
-        // Navegar al nuevo objetivo si existe
-        if (_currentTrack != null)
-        {
-            //Debug.Log($"🚀 Iniciando navegación hacia: {_currentTrack.name}");
             NavigateToTarget(_currentTrack);
         }
+        else if (_currentCarryWeight > 0)
+        {
+            // Tiene peso que depositar: Buscar la SafeZone más cercana dinámicamente
+            _currentTrack = GetNearestSafeZone();
+            if (_currentTrack != null)
+            {
+                Debug.Log($"🏠 Recolector dirigiéndose a zona segura más cercana: {_currentTrack.name}");
+                NavigateToTarget(_currentTrack);
+            }
+            else
+            {
+                Debug.LogError("⚠️ No se encontraron SafeZones con tag 'SafeZoneInteract'. Asegúrate de que existan zonas con este tag.");
+                _isMoving = false;
+            }
+        }
         else
         {
-            Debug.LogWarning("⚠️ No hay objetivo disponible para navegar");
-            _isMoving = false;
+            // Sin plantas asignadas y sin peso: Retornar a posición inicial
+            Debug.Log($"🏡 Recolector retornando a posición inicial (sin plantas asignadas)");
+            _currentTrack = null;
+            NavigateToPosition(_homePosition);
         }
+    }
+
+    // NUEVO: Encuentra la SafeZone más cercana al Recolector
+    private GameObject GetNearestSafeZone()
+    {
+        GameObject[] safeZones = GameObject.FindGameObjectsWithTag("SafeZoneInteract");
+        
+        if (safeZones.Length == 0)
+        {
+            Debug.LogWarning("⚠️ No se encontraron SafeZones con tag 'SafeZoneInteract'");
+            return null;
+        }
+
+        GameObject nearest = null;
+        float minDistance = Mathf.Infinity;
+
+        foreach (GameObject zone in safeZones)
+        {
+            if (zone == null) continue;
+
+            float distance = Vector3.Distance(transform.position, zone.transform.position);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                nearest = zone;
+            }
+        }
+
+        return nearest;
     }
 
     // Nuevo método inspirado en RobotPrueba
@@ -178,7 +217,7 @@ public class Recolector : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"⚠️ Target con tag inesperado: {target.tag}. Usando posición directa.");
+            //Debug.LogWarning($"⚠️ Target con tag inesperado: {target.tag}. Usando posición directa.");
             destination = target.transform.position;
         }
 
@@ -194,6 +233,34 @@ public class Recolector : MonoBehaviour
         else
         {
             Debug.LogWarning($"⚠️ No se pudo establecer el path hacia: {target.name}");
+            _isMoving = false;
+        }
+    }
+
+    // Navegar directamente a una posición (para retornar a home)
+    private void NavigateToPosition(Vector3 position)
+    {
+        if (_navMeshAgent == null)
+        {
+            Debug.LogError("❌ NavMeshAgent es null!");
+            return;
+        }
+        
+        if (!_navMeshAgent.isOnNavMesh)
+        {
+            Debug.LogWarning("⚠️ El recolector no está en el NavMesh!");
+            return;
+        }
+
+        bool pathSet = _navMeshAgent.SetDestination(position);
+        if (pathSet)
+        {
+            _hasArrived = false;
+            _isMoving = true;
+        }
+        else
+        {
+            Debug.LogWarning($"⚠️ No se pudo establecer el path hacia la posición: {position}");
             _isMoving = false;
         }
     }
@@ -226,7 +293,19 @@ public class Recolector : MonoBehaviour
 
     private void DownloadWeight()
     {
-        Zone safeZone = this.safeZone.GetComponent<Zone>();
+        if (_currentTrack == null)
+        {
+            Debug.LogError("⚠️ No se puede descargar peso: _currentTrack es null");
+            return;
+        }
+
+        Zone safeZone = _currentTrack.GetComponent<Zone>();
+        if (safeZone == null)
+        {
+            Debug.LogError("⚠️ El objeto actual no tiene componente Zone");
+            return;
+        }
+
         float exceededWeight = safeZone.DepositeThings(_currentCarryWeight);
         _currentCarryWeight = exceededWeight;
         
@@ -241,6 +320,14 @@ public class Recolector : MonoBehaviour
         if (plant != null && !_trackList.Contains(plant))
         {
             _trackList.Add(plant);
+            Debug.Log($"📋 Recolector {gameObject.name} recibió planta: {plant.name}. Total en lista: {_trackList.Count}");
+            
+            // NUEVO: Si el bot está idle (no moviéndose), iniciar movimiento inmediatamente
+            if (!_isMoving && _currentTrack == null)
+            {
+                Debug.Log($"🚀 Recolector {gameObject.name} disponible, iniciando movimiento...");
+                TrackNextObject();
+            }
         }
     }
 

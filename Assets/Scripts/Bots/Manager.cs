@@ -26,6 +26,12 @@ public class Manager : MonoBehaviour
     [SerializeField]
     private List<ZoneInfo> _zonesInfo;   // <--- AHORA SOLO ESTO MANEJA TODO
 
+    // NUEVO: Referencias a bots para asignación en tiempo real
+    private List<GameObject> _availableRecolectors;
+    private List<GameObject> _availablePurgators;
+    private int _nextRecolectorIndex = 0;
+    private int _nextPurgatorIndex = 0;
+
     void Awake()
     {
         _plantsFoundList = new List<GameObject>();
@@ -33,6 +39,9 @@ public class Manager : MonoBehaviour
         _sickPlantFoundList = new List<GameObject>();
 
         _zonesInfo = new List<ZoneInfo>();
+        
+        _availableRecolectors = new List<GameObject>();
+        _availablePurgators = new List<GameObject>();
 
         _gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
 
@@ -44,6 +53,9 @@ public class Manager : MonoBehaviour
 
     void Start()
     {
+        // NUEVO: Encontrar y cachear todos los bots disponibles
+        InitializeBots();
+        
         // Encontrar al Explorer y enviarle la lista de plantas para explorar
         GameObject explorerObj = GameObject.FindWithTag("BotExplorer");
         if (explorerObj == null)
@@ -77,15 +89,38 @@ public class Manager : MonoBehaviour
         explorer.StartExploration(plantsList);
     }
 
+    // NUEVO: Inicializar y cachear referencias a todos los bots
+    private void InitializeBots()
+    {
+        // Encontrar todos los Recolectores
+        GameObject[] recolectorObjs = GameObject.FindGameObjectsWithTag("BotRecolector");
+        foreach (GameObject obj in recolectorObjs)
+        {
+            Recolector comp = obj.GetComponent<Recolector>();
+            if (comp != null)
+            {
+                _availableRecolectors.Add(obj);
+            }
+        }
+        
+        // Encontrar todos los Purgadores
+        GameObject[] purgatorObjs = GameObject.FindGameObjectsWithTag("BotPurgator");
+        foreach (GameObject obj in purgatorObjs)
+        {
+            Purgator comp = obj.GetComponent<Purgator>();
+            if (comp != null)
+            {
+                _availablePurgators.Add(obj);
+            }
+        }
+        
+        Debug.Log($"🤖 Manager inicializó {_availableRecolectors.Count} Recolectores y {_availablePurgators.Count} Purgadores");
+    }
+
     public void AnalizePlants(List<GameObject> plantsList)
     {
-        Debug.Log($"Analizando lista de plantas recibida con {plantsList.Count} plantas.");
+        Debug.Log($"📥 Manager recibió {plantsList.Count} planta(s) del Explorer para análisis en tiempo real");
         AddPlantList(plantsList);
-
-        Debug.Log($"Se encontraron (Plantas) {_healtyPlantFoundList.Count} saludables y {_sickPlantFoundList.Count} enfermas");
-
-        BuildZonesInfo();        // <--- Construye la lista de ZoneInfo
-        AsignPlantsToZones();    // <--- Usa ZoneInfo.plantsInZone
     }
 
     private void BuildZonesInfo()
@@ -127,42 +162,8 @@ public class Manager : MonoBehaviour
         }
         */
 
-        foreach (GameObject bot in recolectors)
-        {
-            if (bot == null) continue;
-
-            Recolector comp = bot.GetComponent<Recolector>();
-            if (comp == null) continue;
-            if (comp.safeZone == null) continue;
-
-            for (int i = 0; i < _zonesInfo.Count; i++)
-            {
-                if (_zonesInfo[i].zone == comp.safeZone)
-                {
-                    _zonesInfo[i].botsInZone.Add(bot);
-                    break;
-                }
-            }
-        }
-
-        // 4. Asignar bots purgadores a TrashZones
-        foreach (GameObject bot in purgators)
-        {
-            if (bot == null) continue;
-
-            Purgator comp = bot.GetComponent<Purgator>();
-            if (comp == null) continue;
-            if (comp.TrashZone == null) continue;
-
-            for (int i = 0; i < _zonesInfo.Count; i++)
-            {
-                if (_zonesInfo[i].zone == comp.TrashZone)
-                {
-                    _zonesInfo[i].botsInZone.Add(bot);
-                    break;
-                }
-            }
-        }
+        // Nota: Los bots ahora buscan zonas dinámicamente, no necesitan asignación fija
+        Debug.Log($"✅ Inicialización completada: {_availableRecolectors.Count} Recolectores, {_availablePurgators.Count} Purgadores");
 
         // 5. Log de resultado final
         for (int i = 0; i < _zonesInfo.Count; i++)
@@ -188,19 +189,74 @@ public class Manager : MonoBehaviour
             return;
         }
 
-        if (plant.GetComponent<Plant>().isCollected)
+        Plant plantComponent = plant.GetComponent<Plant>();
+
+        if (plantComponent.isCollected)
         {
             Debug.LogWarning($"La planta {plant.name} ya ha sido recolectada. No se puede agregar.");
             return;
         }
 
-        if (PlantIsSick(plant.GetComponent<Plant>()))
+        // Determinar si la planta está sana o enferma
+        bool isSick = PlantIsSick(plantComponent);
+
+        if (isSick)
         {
             _sickPlantFoundList.Add(plant);
+            Debug.Log($"🦠 Planta ENFERMA detectada: {plant.name} - Asignando a Purgador...");
+            
+            // NUEVO: Asignar inmediatamente a un Purgador disponible
+            AssignPlantToPurgator(plant);
         }
         else
         {
             _healtyPlantFoundList.Add(plant);
+            Debug.Log($"✅ Planta SANA detectada: {plant.name} - Asignando a Recolector...");
+            
+            // NUEVO: Asignar inmediatamente a un Recolector disponible
+            AssignPlantToRecolector(plant);
+        }
+    }
+
+    // NUEVO: Asigna una planta sana a un Recolector usando round-robin
+    private void AssignPlantToRecolector(GameObject plant)
+    {
+        if (_availableRecolectors.Count == 0)
+        {
+            Debug.LogWarning("⚠️ No hay Recolectores disponibles para asignar planta");
+            return;
+        }
+
+        // Round-robin: distribuir plantas equitativamente entre Recolectores
+        GameObject selectedRecolector = _availableRecolectors[_nextRecolectorIndex];
+        _nextRecolectorIndex = (_nextRecolectorIndex + 1) % _availableRecolectors.Count;
+
+        Recolector recolectorComp = selectedRecolector.GetComponent<Recolector>();
+        if (recolectorComp != null)
+        {
+            recolectorComp.AddPlantToTrack(plant);
+            Debug.Log($"→ Planta {plant.name} asignada a Recolector: {selectedRecolector.name}");
+        }
+    }
+
+    // NUEVO: Asigna una planta enferma a un Purgador usando round-robin
+    private void AssignPlantToPurgator(GameObject plant)
+    {
+        if (_availablePurgators.Count == 0)
+        {
+            Debug.LogWarning("⚠️ No hay Purgadores disponibles para asignar planta");
+            return;
+        }
+
+        // Round-robin: distribuir plantas equitativamente entre Purgadores
+        GameObject selectedPurgator = _availablePurgators[_nextPurgatorIndex];
+        _nextPurgatorIndex = (_nextPurgatorIndex + 1) % _availablePurgators.Count;
+
+        Purgator purgatorComp = selectedPurgator.GetComponent<Purgator>();
+        if (purgatorComp != null)
+        {
+            purgatorComp.AddPlantToTrack(plant);
+            Debug.Log($"→ Planta {plant.name} asignada a Purgador: {selectedPurgator.name}");
         }
     }
 
