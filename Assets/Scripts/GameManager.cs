@@ -1,9 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using System.Collections.Generic;
-
-
 
 public class GameManager : MonoBehaviour
 {
@@ -114,7 +111,7 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("⚠️ No se encontraron GameObjects con tag 'Plant'");
             
             // Buscar alternativamente por componente Plant
-            Plant[] plantComponents = Object.FindObjectsOfType<Plant>();
+            Plant[] plantComponents = FindObjectsByType<Plant>(FindObjectsSortMode.None);
             
             if (plantComponents != null && plantComponents.Length > 0)
             {

@@ -42,6 +42,41 @@ public class Manager : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        // Encontrar al Explorer y enviarle la lista de plantas para explorar
+        GameObject explorerObj = GameObject.FindWithTag("BotExplorer");
+        if (explorerObj == null)
+        {
+            Debug.LogError("❌ Manager no pudo encontrar Explorer! Asegúrate de que tenga tag 'BotExplorer'");
+            return;
+        }
+
+        Explorer explorer = explorerObj.GetComponent<Explorer>();
+        if (explorer == null)
+        {
+            Debug.LogError("❌ GameObject BotExplorador no tiene componente Explorer!");
+            return;
+        }
+
+        // Obtener todas las plantas de la escena
+        Plant[] allPlants = FindObjectsByType<Plant>(FindObjectsSortMode.None);
+        List<GameObject> plantsList = new List<GameObject>();
+        
+        foreach (Plant plant in allPlants)
+        {
+            if (plant != null && plant.gameObject != null)
+            {
+                plantsList.Add(plant.gameObject);
+            }
+        }
+
+        Debug.Log($"📋 Manager encontró {plantsList.Count} plantas y las enviará al Explorer");
+        
+        // Enviar lista al Explorer para que comience la exploración
+        explorer.StartExploration(plantsList);
+    }
+
     public void AnalizePlants(List<GameObject> plantsList)
     {
         Debug.Log($"Analizando lista de plantas recibida con {plantsList.Count} plantas.");
