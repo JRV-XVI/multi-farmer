@@ -6,10 +6,13 @@ TagManager:
   tags:
   - GameManager
   - Plant
-  - Zone
   - BotRecolector
   - BotPurgator
   - BotExplorer
+  - SafeZone
+  - TrashZone
+  - Pilar
+  - BotManager
   layers:
   - Default
   - TransparentFX

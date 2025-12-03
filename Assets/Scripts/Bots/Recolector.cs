@@ -6,7 +6,6 @@ public class Recolector : MonoBehaviour
 {
     //Objetos externos
     private GameManager _gameManager;
-
     public GameObject safeZone;
 
     //Componentes internos
@@ -18,7 +17,6 @@ public class Recolector : MonoBehaviour
 
     [SerializeField] private float _maxCarryWeight;
     [SerializeField] private float _currentCarryWeight;
-    [SerializeField] private int _currentTomatosCollected;
 
 
         //Control de navegación
@@ -68,6 +66,7 @@ public class Recolector : MonoBehaviour
     {
         CheckNavigationStatus();
         
+        /*
         // Debug temporal para monitorear estado
         if (_currentTrack != null && _navMeshAgent != null && Time.frameCount % 60 == 0) // Solo cada segundo aprox
         {
@@ -75,6 +74,7 @@ public class Recolector : MonoBehaviour
                      $"RemainingDistance={_navMeshAgent.remainingDistance:F2}, " +
                      $"Target={_currentTrack.name}");
         }
+        */
     }
 
     // Método mejorado basado en RobotPrueba para detectar llegada
@@ -117,18 +117,18 @@ public class Recolector : MonoBehaviour
         if (_trackList.Count > 0 && _currentCarryWeight < _maxCarryWeight)
         {
             _currentTrack = _trackList[0];
-            Debug.Log($"🎯 Objetivo seleccionado: {_currentTrack.name}");
+            //Debug.Log($"🎯 Objetivo seleccionado: {_currentTrack.name}");
         }
         else
         {
             _currentTrack = safeZone;
-            Debug.Log($"🏠 Dirigiéndose a zona segura: {(_currentTrack != null ? _currentTrack.name : "NULL")}");
+            //Debug.Log($"🏠 Dirigiéndose a zona segura: {(_currentTrack != null ? _currentTrack.name : "NULL")}");
         }
 
         // Navegar al nuevo objetivo si existe
         if (_currentTrack != null)
         {
-            Debug.Log($"🚀 Iniciando navegación hacia: {_currentTrack.name}");
+            //Debug.Log($"🚀 Iniciando navegación hacia: {_currentTrack.name}");
             NavigateToTarget(_currentTrack);
         }
         else
@@ -161,27 +161,33 @@ public class Recolector : MonoBehaviour
 
         Vector3 destination;
         
-        // Buscar si tiene un componente Plant (que debería ser MonoBehaviour)
-        Plant plantComponent = target.GetComponent<Plant>();
-        if (plantComponent != null)
+        //checar que tipo de objeto es el target
+        if (target.tag == "Plant")
         {
             // Buscar el punto de acceso
-            Transform accessPoint = plantComponent.puntoDeAcceso;
+            Transform accessPoint = target.GetComponent<Plant>().puntoDeAcceso;
             destination = accessPoint != null ? accessPoint.position : target.transform.position;
-            Debug.Log($"🌱 Navegando hacia planta con punto de acceso: {accessPoint != null}");
+            //Debug.Log($"🌱 Navegando hacia planta con punto de acceso: {accessPoint != null}");
+        }
+        else if (target.tag == "Zone" && target.GetComponent<Zone>().zoneType == ZoneType.SafeZone)
+        {
+            // Buscar el punto de acceso
+            Transform accessPoint = target.GetComponent<Zone>().puntoDeAcceso;
+            destination = accessPoint != null ? accessPoint.position : target.transform.position;
+            Debug.Log($"🏠 Navegando hacia objetivo sin componente Plant");
         }
         else
         {
+            Debug.LogWarning($"⚠️ Target con tag inesperado: {target.tag}. Usando posición directa.");
             destination = target.transform.position;
-            Debug.Log($"🏠 Navegando hacia objetivo sin componente Plant");
         }
 
-        Debug.Log($"🗺️ Destino calculado: {destination}");
+        //Debug.Log($"🗺️ Destino calculado: {destination}");
         
         bool pathSet = _navMeshAgent.SetDestination(destination);
         if (pathSet)
         {
-            Debug.Log($"🤖 Navegando hacia: {target.name} - Path establecido correctamente");
+            //Debug.Log($"🤖 Navegando hacia: {target.name} - {target.transform.position} - Path establecido correctamente");
             _hasArrived = false;
             _isMoving = true;
         }
@@ -207,19 +213,13 @@ public class Recolector : MonoBehaviour
             transform.LookAt(plant.transform);
         }
 
+        // Recolectar la planta
+        float tomatosPlantWeight =plant.GetComponent<Plant>().ColectPlant();
+        _currentCarryWeight += tomatosPlantWeight;
+        
         _trackList.Remove(plant);
-        
-        // Marcar como recolectada antes de desactivar
-        if (plantComponent != null)
-        {
-            plantComponent.isCollected = true;
-            _currentCarryWeight += plantComponent.tomatosWeight;
-            _currentTomatosCollected += plantComponent.tomatosNumber;
-        }
-        
-        plant.SetActive(false);
 
-        Debug.Log($"🍅 Recolectado: {plant.name}. Peso actual: {_currentCarryWeight}");
+        //Debug.Log($"🍅 Recolectado: {plant.name}. Peso actual: {_currentCarryWeight}");
 
         TrackNextObject();
     }
@@ -227,10 +227,9 @@ public class Recolector : MonoBehaviour
     private void DownloadWeight()
     {
         Zone safeZone = this.safeZone.GetComponent<Zone>();
-        float exceededWeight = safeZone.DepositeThings(_currentCarryWeight, _currentTomatosCollected);
+        float exceededWeight = safeZone.DepositeThings(_currentCarryWeight);
         _currentCarryWeight = exceededWeight;
-        _currentTomatosCollected = 0;
-
+        
         Debug.Log($"📦 Descargado en zona segura. Peso restante: {_currentCarryWeight}");
 
         TrackNextObject();
@@ -256,6 +255,12 @@ public class Recolector : MonoBehaviour
         return _currentCarryWeight;
     }
 
+    // Método para verificar si puede recolectar más
+    public bool CanCarryMore()
+    {
+        return _currentCarryWeight < _maxCarryWeight;
+    }
+
     // Método para inicializar plantas desde el GameManager
     // Recibe una lista ya filtrada y optimizada por el GameManager
     public void InitializePlantList(List<GameObject> validPlants)
@@ -276,7 +281,7 @@ public class Recolector : MonoBehaviour
         _trackList.Clear();
         _trackList.AddRange(validPlants);
         
-        Debug.Log($"🌱 Recolector inicializado con {_trackList.Count} plantas válidas");
+        Debug.Log($"🌱 Recolector {this.name} inicializado con {_trackList.Count} plantas válidas");
         
         // Comenzar con el primer objetivo si hay plantas
         if (_trackList.Count > 0)
@@ -289,11 +294,6 @@ public class Recolector : MonoBehaviour
         }
     }
 
-    // Método para verificar si puede recolectar más
-    public bool CanCarryMore()
-    {
-        return _currentCarryWeight < _maxCarryWeight;
-    }
 
     // Método para limpiar plantas ya recolectadas de la lista
     public void RefreshAvailablePlants()

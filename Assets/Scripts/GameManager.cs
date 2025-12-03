@@ -1,28 +1,40 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections.Generic;
+
+
 
 public class GameManager : MonoBehaviour
 {
-    //Atributos de los recolectores
+    [Header("Recolectores")]
     public float recolectorDistanceToCollect = 0.5f;
     public float recolectorMaxCarryWeight = 10f;
 
-    //Atributos de los purgadores
+    [Header("Purgadores")]
     public float purgatorDistanceToDeposit = 0.5f;
     public float purgatorMaxCarryWeight = 10f;
 
-    //Atributos de las Zones
+    [Header("Zones")]
     public float safeZoneMaxCarryWeight = 50f;
     public float trashoneMaxCarryWeight = 50f;
 
-    //Atributos del explorador
-    public float explorerScanRange = 2f;
+    [Header("Plantas en escena")]
+    public float plantMinWeight = 5f;
+    public float plantMaxWeight = 20f;
+    public float tomatoesMinWeight = 2f;
+    public float tomatoesMaxWeight = 5f;
 
-    // Listas de plantas catalogadas
-    private List<GameObject> healthyPlants = new List<GameObject>();
-    private List<GameObject> sickPlants = new List<GameObject>();
-    private int totalPlantsExplored = 0;
+    [Header("Margen de enfermedad de planta")]
+    [Tooltip("Máximo porcentaje de enfermedad para considerar saludable (0.0 - 1.0)")]
+    public float plantMaxStemSickPercentage = 0.3f;
+    public float plantMaxTomatoesSickPercentage = 0.3f;
+    public float plantMaxLeavesSickPercentage = 0.3f;
+
+    [Tooltip("Probabilidad de enfermarse por cosecha (0.0 - 1.0)")]
+    public float plantStemSickChancePerHarvest = 0.1f;
+    public float plantTomatoesSickChancePerHarvest = 0.1f;
+    public float plantLeavesSickChancePerHarvest = 0.1f;
 
     void Start()
     {
@@ -30,6 +42,13 @@ public class GameManager : MonoBehaviour
         if(recolector == null)
         {
             Debug.LogError("Recolector not found in the scene!!");
+            return;
+        }
+
+        GameObject purgator = GameObject.FindWithTag("BotPurgator");
+        if(purgator == null)
+        {
+            Debug.LogError("Purgator not found in the scene!!");
             return;
         }
 
@@ -52,8 +71,17 @@ public class GameManager : MonoBehaviour
                 Debug.LogError("❌ El GameObject BotRecolector no tiene el componente Recolector!");
                 return;
             }
+            //recolectorComponent.InitializePlantList(plantsFound);
             
-            recolectorComponent.InitializePlantList(plantsFound);
+
+            Purgator purgatorComponent = purgator.GetComponent<Purgator>();
+            if(purgatorComponent == null)
+            {
+                Debug.LogError("❌ El GameObject BotPurgator no tiene el componente Purgator!");
+                return;
+            }
+            //purgatorComponent.InitializePlantList(plantsFound);
+
         }
         else
         {
@@ -65,6 +93,10 @@ public class GameManager : MonoBehaviour
                 recolectorComponent.InitializePlantList(new List<GameObject>());
             }
         }
+
+
+        /// Comenta esto cuando tengas el bot Explorador.
+        GameObject.FindGameObjectWithTag("BotManager").GetComponent<Manager>().AnalizePlants(plantsFound);
     }
 
     // Update is called once per frame
@@ -73,7 +105,7 @@ public class GameManager : MonoBehaviour
         
     }
 
-    List<GameObject> FindPlantsInScene()
+    public List<GameObject> FindPlantsInScene()
     {
         GameObject[] plantsArray = GameObject.FindGameObjectsWithTag("Plant");
         
@@ -82,8 +114,9 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("⚠️ No se encontraron GameObjects con tag 'Plant'");
             
             // Buscar alternativamente por componente Plant
-            Plant[] plantComponents = FindObjectsByType<Plant>(FindObjectsSortMode.None);
-            if(plantComponents != null && plantComponents.Length > 0)
+            Plant[] plantComponents = Object.FindObjectsOfType<Plant>();
+            
+            if (plantComponents != null && plantComponents.Length > 0)
             {
                 Debug.Log($"🔍 Se encontraron {plantComponents.Length} objetos con componente Plant");
                 return FilterValidPlants(plantComponents);
@@ -215,6 +248,20 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void RefreshPlantsForPurgator()
+    {
+        GameObject purgator = GameObject.FindWithTag("BotPurgator");
+        if(purgator != null)
+        {
+            Purgator purgatorComponent = purgator.GetComponent<Purgator>();
+            if(purgatorComponent != null)
+            {
+                List<GameObject> freshPlants = FindPlantsInScene();
+                purgatorComponent.InitializePlantList(freshPlants);
+            }
+        }
+    }
+
     // Método para obtener plantas válidas disponibles (sin inicializar recolector)
     public List<GameObject> GetValidPlants()
     {
@@ -223,48 +270,34 @@ public class GameManager : MonoBehaviour
 
 
 
-    // Método llamado por el Explorer para reportar una planta
-    public void ReportPlant(GameObject plantObject, Plant plantData)
+
+
+    //Esto es lo unico que se mantendra del GameManager original
+    public void StartPlantValuesRandomly(Plant plant)
     {
-        if (plantData.hasBeenExplored)
-        {
-            return; // Ya fue reportada
-        }
+        //Asigancion de valroes de forma random
+        plant.plantWeight = Random.Range(plantMinWeight, plantMaxWeight);
+        plant.tomatosWeight = Random.Range(tomatoesMinWeight, tomatoesMaxWeight);
 
-        plantData.hasBeenExplored = true;
-        totalPlantsExplored++;
+        //Valoeres de enfermedad
+        if (Random.Range(0f, 1f) < plantStemSickChancePerHarvest)
+            plant.stemSickPercentage = Random.Range(plantMaxStemSickPercentage, 1f);
+        else
+            plant.stemSickPercentage = Random.Range(0f, plantMaxStemSickPercentage);
 
-        if (plantData.IsHealthy())
-        {
-            healthyPlants.Add(plantObject);
-            Debug.Log($"✓ Planta sana detectada (ID: {plantData.id}). Total sanas: {healthyPlants.Count}");
-        }
-        else if (plantData.IsSick())
-        {
-            sickPlants.Add(plantObject);
-            Debug.Log($"✗ Planta enferma detectada (ID: {plantData.id}). Total enfermas: {sickPlants.Count}");
-        }
+        if (Random.Range(0f, 1f) < plantTomatoesSickChancePerHarvest)
+            plant.tomatoesSickPercentage = Random.Range(plantMaxTomatoesSickPercentage, 1f);
+        else
+            plant.tomatoesSickPercentage = Random.Range(0f, plantMaxTomatoesSickPercentage);
+
+        if (Random.Range(0f, 1f) < plantLeavesSickChancePerHarvest)
+            plant.leavesSickPercentage = Random.Range(plantMaxLeavesSickPercentage, 1f);
+        else
+            plant.leavesSickPercentage = Random.Range(0f, plantMaxLeavesSickPercentage);
+
+
+
+        //Y tambien falta asignar la imagen
     }
 
-    // Métodos para que Recolector y Purgador obtengan sus objetivos
-    public List<GameObject> GetHealthyPlants()
-    {
-        return new List<GameObject>(healthyPlants);
-    }
-
-    public List<GameObject> GetSickPlants()
-    {
-        return new List<GameObject>(sickPlants);
-    }
-
-    public void RemovePlantFromList(GameObject plant)
-    {
-        healthyPlants.Remove(plant);
-        sickPlants.Remove(plant);
-    }
-
-    public int GetTotalPlantsExplored()
-    {
-        return totalPlantsExplored;
-    }
 }

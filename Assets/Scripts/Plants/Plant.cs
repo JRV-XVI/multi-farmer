@@ -5,44 +5,47 @@ public class Plant : MonoBehaviour
     public int id;
 
     [Header("Arrastra aquí el hijo 'PuntoInteraccion'")]
-    public Transform puntoDeAcceso; 
+    public Transform puntoDeAcceso;
 
     //Datos de peso para recolector y purgador
+    [Header("Datos de recolección")]
     public float plantWeight;
     public float tomatosWeight;
-    public int tomatosNumber;
 
     public bool isCollected;
 
     //Datos de enfermedad para explorer
-    public bool plantIsSick;
-    public bool tomatosAreSick;
-    public bool leavesAreSick;
+    [Header("Datos de enfermedad")]
+    public float stemSickPercentage;     //0% (0.00f) a 100% (1.00f)
+    public float tomatoesSickPercentage; //0% (0.00f) a 100% (1.00f)
+    public float leavesSickPercentage;   //0% (0.00f) a 100% (1.00f)
 
-    public Sprite plantImage;
+    public string plantImage;
 
-    // Indica si esta planta ya fue explorada
-    [HideInInspector]
-    public bool hasBeenExplored = false;
 
-    void Start()
+
+
+    public void Start()
     {
-        // Generar ID único si no está asignado
-        if (id == 0)
-        {
-            id = gameObject.GetInstanceID();
-        }
+        GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>().StartPlantValuesRandomly(this);
+        isCollected = false;
+        
     }
 
-    // Determina si la planta está completamente sana
-    public bool IsHealthy()
-    {
-        return !plantIsSick && !tomatosAreSick && !leavesAreSick;
+    public float ColectPlant(){
+        float tw = tomatosWeight;
+
+        isCollected = true;
+        tomatosWeight = 0;
+
+        return tw;
     }
 
-    // Determina si la planta tiene alguna enfermedad
-    public bool IsSick()
-    {
-        return plantIsSick || tomatosAreSick || leavesAreSick;
+    public float PurgePlant(){
+        float pw = plantWeight;
+
+        gameObject.SetActive(false);
+
+        return pw;
     }
 }
