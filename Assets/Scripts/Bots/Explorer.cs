@@ -193,13 +193,16 @@ public class Explorer : MonoBehaviour
         }
     }
 
-    // Inspecciona la planta y la añade a la lista de exploradas
+    // Inspecciona la planta y la envía inmediatamente al Manager
     private void InspectPlant(GameObject plantObject)
     {
         if (!_exploredPlants.Contains(plantObject))
         {
             _exploredPlants.Add(plantObject);
             Debug.Log($"🔍 Explorer inspeccionó planta: {plantObject.name} (Total: {_exploredPlants.Count})");
+            
+            // NUEVO: Enviar planta al Manager inmediatamente (modo streaming)
+            SendPlantToManager(plantObject);
         }
         
         // Remover de la lista de no exploradas
@@ -230,10 +233,10 @@ public class Explorer : MonoBehaviour
             if (!_explorationComplete)
             {
                 _explorationComplete = true;
-                Debug.Log($"✅ Explorer ha completado la exploración! Total plantas encontradas: {_exploredPlants.Count}");
+                Debug.Log($"✅ Explorer ha completado la exploración! Total plantas enviadas al Manager: {_exploredPlants.Count}");
                 
-                // Enviar reporte al Manager
-                SendReportToManager();
+                // NOTA: Las plantas ya fueron enviadas una por una durante la exploración
+                // No hay necesidad de enviar reporte batch aquí
                 
                 // Volver a la posición inicial si está definida
                 if (homePosition != null)
@@ -245,6 +248,29 @@ public class Explorer : MonoBehaviour
         }
     }
 
+    // NUEVO: Envía una planta individual al Manager inmediatamente después de explorarla
+    private void SendPlantToManager(GameObject plantObject)
+    {
+        if (_manager == null)
+        {
+            Debug.LogError("❌ No se puede enviar planta al Manager: Manager no encontrado!");
+            return;
+        }
+
+        if (plantObject == null)
+        {
+            Debug.LogWarning("⚠️ Intentando enviar planta null al Manager");
+            return;
+        }
+
+        // Enviar planta individual al Manager en una lista de un solo elemento
+        List<GameObject> singlePlantList = new List<GameObject> { plantObject };
+        _manager.AnalizePlants(singlePlantList);
+        
+        Debug.Log($"📤 Explorer envió planta {plantObject.name} al Manager (modo streaming)");
+    }
+
+    // [MÉTODO LEGACY - Mantener como backup para uso manual]
     // Envía la lista completa de plantas exploradas al Manager
     private void SendReportToManager()
     {
@@ -272,7 +298,7 @@ public class Explorer : MonoBehaviour
         _manager.AnalizePlants(_exploredPlants);
         
         _reportSent = true;
-        Debug.Log("✅ Reporte enviado exitosamente al Manager!");
+        Debug.Log("✅ Exploración completada!");
     }
 
     // [MÉTODO DE UTILIDAD - NO USADO ACTUALMENTE]
