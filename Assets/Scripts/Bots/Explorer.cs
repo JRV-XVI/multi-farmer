@@ -24,7 +24,8 @@ public class Explorer : MonoBehaviour
     private bool _reportSent = false;
     
     // Punto de inicio/base para volver después de explorar
-    public GameObject homePosition;
+    private Vector3 _homePosition;
+    private bool _returningHome = false;
 
     void Awake()
     {
@@ -55,8 +56,11 @@ public class Explorer : MonoBehaviour
             return;
         }
 
-        // NUEVO: No empezar automáticamente, esperar a que Manager llame StartExploration()
-        Debug.Log("🤖 Explorer listo y esperando orden del Manager para comenzar exploración...");
+        // Guardar la posición inicial del Explorer para regresar después
+        _homePosition = transform.position;
+        Debug.Log($"Explorer guardó posición inicial: {_homePosition}");
+
+        Debug.Log("Explorer listo y esperando orden del Manager para comenzar exploración...");
     }
 
     void Update()
@@ -68,19 +72,19 @@ public class Explorer : MonoBehaviour
         CheckNavigationStatus();
     }
 
-    // NUEVO MÉTODO PÚBLICO: El Manager llama este método para iniciar la exploración
+    // El Manager llama este método para iniciar la exploración
     public void StartExploration(List<GameObject> plantsToExplore)
     {
         if (plantsToExplore == null || plantsToExplore.Count == 0)
         {
-            Debug.LogWarning("⚠️ Explorer recibió una lista vacía o null del Manager!");
+            Debug.LogWarning("Explorer recibió una lista vacía o null del Manager!");
             return;
         }
 
         _unexploredPlants.Clear();
         _unexploredPlants.AddRange(plantsToExplore);
 
-        // OPTIMIZACIÓN: Ordenar plantas por posición para crear un recorrido más eficiente
+        // Ordenar plantas por posición para crear un recorrido más eficiente
         // Ordena primero por X (columnas), luego por Z (filas)
         _unexploredPlants.Sort((a, b) =>
         {
@@ -97,7 +101,7 @@ public class Explorer : MonoBehaviour
             return posA.z.CompareTo(posB.z);
         });
         
-        Debug.Log($"🔍 Explorer recibió {_unexploredPlants.Count} plantas del Manager (ordenadas por posición)");
+        Debug.Log($"Explorer recibió {_unexploredPlants.Count} plantas del Manager (ordenadas por posición)");
         
         // Comenzar la exploración
         if (_unexploredPlants.Count > 0)
@@ -106,8 +110,7 @@ public class Explorer : MonoBehaviour
         }
     }
 
-    // [MÉTODO LEGACY - Mantener como backup]
-    // Encuentra todas las plantas en la escena de forma independiente
+    // Método legacy - Encuentra todas las plantas en la escena de forma independiente
     private void FindAllUnexploredPlants()
     {
         Plant[] allPlants = FindObjectsByType<Plant>(FindObjectsSortMode.None);
@@ -118,22 +121,19 @@ public class Explorer : MonoBehaviour
             _unexploredPlants.Add(plant.gameObject);
         }
         
-        // OPTIMIZACIÓN: Ordenar plantas por posición para crear un recorrido más eficiente
-        // Ordena primero por X (columnas), luego por Z (filas)
+        // Ordenar plantas por posición para crear un recorrido más eficiente
         _unexploredPlants.Sort((a, b) =>
         {
             Vector3 posA = a.transform.position;
             Vector3 posB = b.transform.position;
             
-            // Comparar primero por coordenada X (izquierda a derecha)
             int compareX = posA.x.CompareTo(posB.x);
             if (compareX != 0) return compareX;
             
-            // Si están en la misma X, comparar por Z (adelante a atrás)
             return posA.z.CompareTo(posB.z);
         });
         
-        Debug.Log($"🔍 Explorer encontró {_unexploredPlants.Count} plantas para explorar (ordenadas por posición)");
+        Debug.Log($"Explorer encontró {_unexploredPlants.Count} plantas para explorar (ordenadas por posición)");
     }
 
     // Método mejorado basado en Recolector para detectar llegada
@@ -160,7 +160,15 @@ public class Explorer : MonoBehaviour
         _hasArrived = true;
         _isMoving = false;
 
-        Debug.Log($"🎯 Explorer llegó a: {_currentTarget.name}");
+        Debug.Log($"Explorer llegó a: {(_currentTarget != null ? _currentTarget.name : "posición inicial")}");
+
+        // Si estaba regresando a casa, marcar como completo
+        if (_returningHome)
+        {
+            _returningHome = false;
+            Debug.Log("Explorer ha regresado a su posición inicial");
+            return;
+        }
 
         // Escanear en detalle en la ubicación actual
         ScanForPlants();
@@ -198,112 +206,137 @@ public class Explorer : MonoBehaviour
     {
         if (!_exploredPlants.Contains(plantObject))
         {
-            _exploredPlants.Add(plantObject);
-            Debug.Log($"🔍 Explorer inspeccionó planta: {plantObject.name} (Total: {_exploredPlants.Count})");
+            // Escanear la planta para generar sus valores antes de enviar al Manager
+            Plant plantComponent = plantObject.GetComponent<Plant>();
+            if (plantComponent != null)
+            {
+                plantComponent.ScanPlant();
+            }
             
-            // NUEVO: Enviar planta al Manager inmediatamente (modo streaming)
+            _exploredPlants.Add(plantObject);
+            Debug.Log($"Explorer inspeccionó planta: {plantObject.name} (Total: {_exploredPlants.Count})");
+            
             SendPlantToManager(plantObject);
         }
         
-        // Remover de la lista de no exploradas
         _unexploredPlants.Remove(plantObject);
     }
 
     // Navega a la siguiente planta no explorada
     private void MoveToNextPlant()
     {
-        // Limpiar plantas null de la lista
         _unexploredPlants.RemoveAll(plant => plant == null);
 
         if (_unexploredPlants.Count > 0)
         {
-            // OPTIMIZACIÓN: Tomar la primera planta de la lista en lugar de la más cercana
-            // Esto evita el zigzag constante y crea un patrón más eficiente
+            // Tomar la primera planta de la lista (recorrido ordenado)
             _currentTarget = _unexploredPlants[0];
             
             if (_currentTarget != null)
             {
-                Debug.Log($"🎯 Explorer objetivo seleccionado: {_currentTarget.name} (Quedan {_unexploredPlants.Count})");
+                Debug.Log($"Explorer objetivo seleccionado: {_currentTarget.name} (Quedan {_unexploredPlants.Count})");
                 NavigateToTarget(_currentTarget);
             }
         }
         else
         {
-            // Exploración completada
             if (!_explorationComplete)
             {
                 _explorationComplete = true;
-                Debug.Log($"✅ Explorer ha completado la exploración! Total plantas enviadas al Manager: {_exploredPlants.Count}");
+                Debug.Log($"Explorer ha completado la exploración! Total plantas enviadas al Manager: {_exploredPlants.Count}");
                 
-                // NOTA: Las plantas ya fueron enviadas una por una durante la exploración
-                // No hay necesidad de enviar reporte batch aquí
-                
-                // Volver a la posición inicial si está definida
-                if (homePosition != null)
-                {
-                    _currentTarget = homePosition;
-                    NavigateToTarget(homePosition);
-                }
+                ReturnHome();
             }
         }
     }
 
-    // NUEVO: Envía una planta individual al Manager inmediatamente después de explorarla
+    // Método para regresar a la posición inicial
+    private void ReturnHome()
+    {
+        if (_navMeshAgent == null)
+        {
+            Debug.LogError("NavMeshAgent es null, no se puede regresar a casa!");
+            return;
+        }
+
+        if (!_navMeshAgent.isOnNavMesh)
+        {
+            Debug.LogWarning("El Explorer no está en el NavMesh, no puede regresar a casa!");
+            return;
+        }
+
+        Debug.Log($"Explorer regresando a posición inicial: {_homePosition}");
+        
+        _returningHome = true;
+        _currentTarget = null;
+        
+        bool pathSet = _navMeshAgent.SetDestination(_homePosition);
+        if (pathSet)
+        {
+            _hasArrived = false;
+            _isMoving = true;
+            Debug.Log("Ruta hacia casa establecida correctamente");
+        }
+        else
+        {
+            Debug.LogWarning("No se pudo establecer la ruta hacia la posición inicial");
+            _isMoving = false;
+            _returningHome = false;
+        }
+    }
+
+    // Envía una planta individual al Manager inmediatamente después de explorarla
     private void SendPlantToManager(GameObject plantObject)
     {
         if (_manager == null)
         {
-            Debug.LogError("❌ No se puede enviar planta al Manager: Manager no encontrado!");
+            Debug.LogError("No se puede enviar planta al Manager: Manager no encontrado!");
             return;
         }
 
         if (plantObject == null)
         {
-            Debug.LogWarning("⚠️ Intentando enviar planta null al Manager");
+            Debug.LogWarning("Intentando enviar planta null al Manager");
             return;
         }
 
-        // Enviar planta individual al Manager en una lista de un solo elemento
+        // Enviar planta individual al Manager
         List<GameObject> singlePlantList = new List<GameObject> { plantObject };
         _manager.AnalizePlants(singlePlantList);
         
-        Debug.Log($"📤 Explorer envió planta {plantObject.name} al Manager (modo streaming)");
+        Debug.Log($"Explorer envió planta {plantObject.name} al Manager");
     }
 
-    // [MÉTODO LEGACY - Mantener como backup para uso manual]
-    // Envía la lista completa de plantas exploradas al Manager
+    // Método legacy - Envía la lista completa de plantas exploradas al Manager
     private void SendReportToManager()
     {
         if (_reportSent)
         {
-            Debug.LogWarning("⚠️ El reporte ya fue enviado al Manager");
+            Debug.LogWarning("El reporte ya fue enviado al Manager");
             return;
         }
 
         if (_manager == null)
         {
-            Debug.LogError("❌ No se puede enviar reporte: Manager no encontrado!");
+            Debug.LogError("No se puede enviar reporte: Manager no encontrado!");
             return;
         }
 
         if (_exploredPlants.Count == 0)
         {
-            Debug.LogWarning("⚠️ No hay plantas exploradas para reportar");
+            Debug.LogWarning("No hay plantas exploradas para reportar");
             return;
         }
 
-        Debug.Log($"📤 Explorer enviando reporte de {_exploredPlants.Count} plantas al Manager...");
+        Debug.Log($"Explorer enviando reporte de {_exploredPlants.Count} plantas al Manager...");
         
-        // Enviar la lista completa de plantas al Manager
         _manager.AnalizePlants(_exploredPlants);
         
         _reportSent = true;
-        Debug.Log("✅ Exploración completada!");
+        Debug.Log("Exploración completada!");
     }
 
-    // [MÉTODO DE UTILIDAD - NO USADO ACTUALMENTE]
-    // Obtiene la planta no explorada más cercana
-    // Nota: Este método causaba zigzag. Ahora se usa orden secuencial en MoveToNextPlant()
+    // Método de utilidad - No usado actualmente (causaba zigzag)
     private GameObject GetClosestPlant()
     {
         GameObject closest = null;
@@ -324,24 +357,23 @@ public class Explorer : MonoBehaviour
         return closest;
     }
 
-    // Método de navegación inspirado en Recolector
     private void NavigateToTarget(GameObject target)
     {
         if (_navMeshAgent == null)
         {
-            Debug.LogError("❌ NavMeshAgent es null!");
+            Debug.LogError("NavMeshAgent es null!");
             return;
         }
         
         if (target == null)
         {
-            Debug.LogError("❌ Target es null!");
+            Debug.LogError("Target es null!");
             return;
         }
         
         if (!_navMeshAgent.isOnNavMesh)
         {
-            Debug.LogWarning("⚠️ El Explorer no está en el NavMesh!");
+            Debug.LogWarning("El Explorer no está en el NavMesh!");
             return;
         }
 
@@ -351,9 +383,17 @@ public class Explorer : MonoBehaviour
         Plant plantComponent = target.GetComponent<Plant>();
         if (plantComponent != null)
         {
-            // Buscar el punto de acceso
-            Transform accessPoint = plantComponent.puntoDeAcceso;
-            destination = accessPoint != null ? accessPoint.position : target.transform.position;
+            // Buscar el punto de acceso o hijo "PuntoInteraccion"
+            Transform puntoInteraccion = target.transform.Find("PuntoInteraccion");
+            if (puntoInteraccion != null)
+            {
+                destination = puntoInteraccion.position;
+            }
+            else
+            {
+                Transform accessPoint = plantComponent.puntoDeAcceso;
+                destination = accessPoint != null ? accessPoint.position : target.transform.position;
+            }
         }
         else
         {
@@ -368,7 +408,7 @@ public class Explorer : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"⚠️ No se pudo establecer el path hacia: {target.name}");
+            Debug.LogWarning($"No se pudo establecer el path hacia: {target.name}");
             _isMoving = false;
         }
     }
@@ -422,7 +462,9 @@ public class Explorer : MonoBehaviour
     {
         _explorationComplete = false;
         _reportSent = false;
+        _returningHome = false;
         _exploredPlants.Clear();
+        _homePosition = transform.position; // Actualizar posición inicial
         FindAllUnexploredPlants();
         if (_unexploredPlants.Count > 0)
         {

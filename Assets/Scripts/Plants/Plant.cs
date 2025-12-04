@@ -5,31 +5,56 @@ public class Plant : MonoBehaviour
     public int id;
 
     [Header("Arrastra aquí el hijo 'PuntoInteraccion'")]
-    public Transform puntoDeAcceso;
+    public Transform puntoDeAcceso; 
 
     //Datos de peso para recolector y purgador
-    [Header("Datos de recolección")]
     public float plantWeight;
     public float tomatosWeight;
 
     public bool isCollected;
 
     //Datos de enfermedad para explorer
-    [Header("Datos de enfermedad")]
-    public float stemSickPercentage;     //0% (0.00f) a 100% (1.00f)
-    public float tomatoesSickPercentage; //0% (0.00f) a 100% (1.00f)
-    public float leavesSickPercentage;   //0% (0.00f) a 100% (1.00f)
+    public bool plantIsSick;
+    public bool tomatosAreSick;
+    public bool leavesAreSick;
 
     public string plantImage;
 
-
-
+    // Control para asegurar que solo se inicialice cuando el Explorer la visite
+    private bool _hasBeenScanned = false;
 
     public void Start()
     {
-        GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>().StartPlantValuesRandomly(this);
+        // No inicializar valores aquí - Los valores se generarán cuando el Explorer escanee la planta
         isCollected = false;
-        
+        _hasBeenScanned = false;
+    }
+
+    // Método público que el Explorer llamará para inicializar la planta
+    public void ScanPlant()
+    {
+        if (_hasBeenScanned)
+        {
+            return;
+        }
+
+        // Generar valores aleatorios cuando el Explorer la escanea
+        GameObject gameManagerObj = GameObject.FindGameObjectWithTag("GameManager");
+        if (gameManagerObj != null)
+        {
+            GameManager gm = gameManagerObj.GetComponent<GameManager>();
+            if (gm != null)
+            {
+                gm.StartPlantValuesRandomly(this);
+                _hasBeenScanned = true;
+            }
+        }
+    }
+
+    // Verifica si la planta ha sido escaneada
+    public bool HasBeenScanned()
+    {
+        return _hasBeenScanned;
     }
 
     public float ColectPlant(){

@@ -35,6 +35,13 @@ public class Recolector : MonoBehaviour
         {
             Debug.LogError("NavMeshAgent not found in the Recolector!!");
         }
+        else
+        {
+            // Configurar distancia de parada para evitar colisiones entre bots
+            _navMeshAgent.stoppingDistance = 1.5f;
+            _navMeshAgent.radius = 0.5f; // Asegurar radio apropiado
+            _navMeshAgent.avoidancePriority = Random.Range(40, 60); // Prioridad aleatoria para evitar bloqueos
+        }
         
         // Inicializar lista de seguimiento
         _trackList = new List<GameObject>();
@@ -210,17 +217,46 @@ public class Recolector : MonoBehaviour
         //checar que tipo de objeto es el target
         if (target.tag == "Plant")
         {
-            // Buscar el punto de acceso
-            Transform accessPoint = target.GetComponent<Plant>().puntoDeAcceso;
-            destination = accessPoint != null ? accessPoint.position : target.transform.position;
-            //Debug.Log($"🌱 Navegando hacia planta con punto de acceso: {accessPoint != null}");
+            // Buscar el hijo "PuntoInteraccion" directamente
+            Transform puntoInteraccion = target.transform.Find("PuntoInteraccion");
+            if (puntoInteraccion != null)
+            {
+                destination = puntoInteraccion.position;
+                
+                // NUEVO: Añadir pequeño offset aleatorio para evitar colisiones entre múltiples bots
+                Vector3 randomOffset = new Vector3(
+                    Random.Range(-0.3f, 0.3f),
+                    0f,
+                    Random.Range(-0.3f, 0.3f)
+                );
+                destination += randomOffset;
+                
+                //Debug.Log($"🌱 Navegando hacia PuntoInteraccion de {target.name}");
+            }
+            else
+            {
+                // Fallback: usar puntoDeAcceso del componente Plant
+                Plant plantComponent = target.GetComponent<Plant>();
+                Transform accessPoint = plantComponent != null ? plantComponent.puntoDeAcceso : null;
+                destination = accessPoint != null ? accessPoint.position : target.transform.position;
+                //Debug.LogWarning($"⚠️ No se encontró hijo 'PuntoInteraccion' en {target.name}, usando fallback");
+            }
         }
         else if (target.tag == "Zone" && target.GetComponent<Zone>().zoneType == ZoneType.SafeZone)
         {
             // Buscar el punto de acceso
             Transform accessPoint = target.GetComponent<Zone>().puntoDeAcceso;
             destination = accessPoint != null ? accessPoint.position : target.transform.position;
-            Debug.Log($"🏠 Navegando hacia objetivo sin componente Plant");
+            
+            // NUEVO: Offset para zonas también
+            Vector3 randomOffset = new Vector3(
+                Random.Range(-0.5f, 0.5f),
+                0f,
+                Random.Range(-0.5f, 0.5f)
+            );
+            destination += randomOffset;
+            
+            //Debug.Log($"🏠 Navegando hacia SafeZone");
         }
         else
         {
@@ -233,7 +269,7 @@ public class Recolector : MonoBehaviour
         bool pathSet = _navMeshAgent.SetDestination(destination);
         if (pathSet)
         {
-            //Debug.Log($"🤖 Navegando hacia: {target.name} - {target.transform.position} - Path establecido correctamente");
+            //Debug.Log($"🤖 Navegando hacia: {target.name} - Path establecido correctamente");
             _hasArrived = false;
             _isMoving = true;
         }
@@ -275,23 +311,30 @@ public class Recolector : MonoBehaviour
 
     private void ColectPlant(GameObject targetObject)
     {
-        // Si el targetObject es PuntoInteraccion, obtener el componente Plant del padre
-        GameObject plantObject = targetObject.GetComponent<Plant>() != null ? targetObject : targetObject.transform.parent.gameObject;
-        Plant plantComponent = plantObject.GetComponent<Plant>();
+        // Buscar el hijo "PuntoInteraccion" para orientación
+        Transform puntoInteraccion = plant.transform.Find("PuntoInteraccion");
         
-        if (plantComponent == null)
+        if (puntoInteraccion != null)
         {
-            Debug.LogError($"⚠️ No se encontró componente Plant en {plantObject.name}");
-            _trackList.Remove(targetObject);
-            TrackNextObject();
-            return;
+            // Orientarse hacia el PuntoInteraccion
+            transform.rotation = puntoInteraccion.rotation;
         }
-        
-        // Orientarse hacia el punto de interacción
-        transform.LookAt(targetObject.transform);
+        else
+        {
+            // Fallback: usar puntoDeAcceso del componente o LookAt
+            Plant plantComponent = plant.GetComponent<Plant>();
+            if (plantComponent != null && plantComponent.puntoDeAcceso != null)
+            {
+                transform.rotation = plantComponent.puntoDeAcceso.rotation;
+            }
+            else
+            {
+                transform.LookAt(plant.transform);
+            }
+        }
 
         // Recolectar la planta
-        float tomatosPlantWeight = plantComponent.ColectPlant();
+        float tomatosPlantWeight = plant.GetComponent<Plant>().ColectPlant();
         _currentCarryWeight += tomatosPlantWeight;
         
         _trackList.Remove(targetObject);

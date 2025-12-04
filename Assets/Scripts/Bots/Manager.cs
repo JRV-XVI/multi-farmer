@@ -53,21 +53,21 @@ public class Manager : MonoBehaviour
 
     void Start()
     {
-        // NUEVO: Encontrar y cachear todos los bots disponibles
+        // Encontrar y cachear todos los bots disponibles
         InitializeBots();
         
         // Encontrar al Explorer y enviarle la lista de plantas para explorar
         GameObject explorerObj = GameObject.FindWithTag("BotExplorer");
         if (explorerObj == null)
         {
-            Debug.LogError("❌ Manager no pudo encontrar Explorer! Asegúrate de que tenga tag 'BotExplorer'");
+            Debug.LogError("Manager no pudo encontrar Explorer! Asegúrate de que tenga tag 'BotExplorer'");
             return;
         }
 
         Explorer explorer = explorerObj.GetComponent<Explorer>();
         if (explorer == null)
         {
-            Debug.LogError("❌ GameObject BotExplorador no tiene componente Explorer!");
+            Debug.LogError("GameObject BotExplorador no tiene componente Explorer!");
             return;
         }
 
@@ -83,13 +83,13 @@ public class Manager : MonoBehaviour
             }
         }
 
-        Debug.Log($"📋 Manager encontró {plantsList.Count} plantas y las enviará al Explorer");
+        Debug.Log($"Manager encontró {plantsList.Count} plantas y las enviará al Explorer");
         
         // Enviar lista al Explorer para que comience la exploración
         explorer.StartExploration(plantsList);
     }
 
-    // NUEVO: Inicializar y cachear referencias a todos los bots
+    // Inicializar y cachear referencias a todos los bots
     private void InitializeBots()
     {
         // Encontrar todos los Recolectores
@@ -114,12 +114,12 @@ public class Manager : MonoBehaviour
             }
         }
         
-        Debug.Log($"🤖 Manager inicializó {_availableRecolectors.Count} Recolectores y {_availablePurgators.Count} Purgadores");
+        Debug.Log($"Manager inicializó {_availableRecolectors.Count} Recolectores y {_availablePurgators.Count} Purgadores");
     }
 
     public void AnalizePlants(List<GameObject> plantsList)
     {
-        Debug.Log($"📥 Manager recibió {plantsList.Count} planta(s) del Explorer para análisis en tiempo real");
+        Debug.Log($"Manager recibió {plantsList.Count} planta(s) del Explorer para análisis");
         AddPlantList(plantsList);
     }
 
@@ -191,6 +191,13 @@ public class Manager : MonoBehaviour
 
         Plant plantComponent = plant.GetComponent<Plant>();
 
+        // Verificar que la planta haya sido escaneada antes de procesar
+        if (!plantComponent.HasBeenScanned())
+        {
+            Debug.LogWarning($"Planta {plant.name} aún no ha sido escaneada por Explorer. Ignorando...");
+            return;
+        }
+
         if (plantComponent.isCollected)
         {
             Debug.LogWarning($"La planta {plant.name} ya ha sido recolectada. No se puede agregar.");
@@ -203,27 +210,25 @@ public class Manager : MonoBehaviour
         if (isSick)
         {
             _sickPlantFoundList.Add(plant);
-            Debug.Log($"🦠 Planta ENFERMA detectada: {plant.name} - Asignando a Purgador...");
+            Debug.Log($"Planta ENFERMA detectada: {plant.name} - Asignando a Purgador...");
             
-            // NUEVO: Asignar inmediatamente a un Purgador disponible
             AssignPlantToPurgator(plant);
         }
         else
         {
             _healtyPlantFoundList.Add(plant);
-            Debug.Log($"✅ Planta SANA detectada: {plant.name} - Asignando a Recolector...");
+            Debug.Log($"Planta SANA detectada: {plant.name} - Asignando a Recolector...");
             
-            // NUEVO: Asignar inmediatamente a un Recolector disponible
             AssignPlantToRecolector(plant);
         }
     }
 
-    // NUEVO: Asigna una planta sana a un Recolector usando round-robin
+    // Asigna una planta sana a un Recolector usando round-robin
     private void AssignPlantToRecolector(GameObject plant)
     {
         if (_availableRecolectors.Count == 0)
         {
-            Debug.LogWarning("⚠️ No hay Recolectores disponibles para asignar planta");
+            Debug.LogWarning("No hay Recolectores disponibles para asignar planta");
             return;
         }
 
@@ -235,16 +240,16 @@ public class Manager : MonoBehaviour
         if (recolectorComp != null)
         {
             recolectorComp.AddPlantToTrack(plant);
-            Debug.Log($"→ Planta {plant.name} asignada a Recolector: {selectedRecolector.name}");
+            Debug.Log($"Planta {plant.name} asignada a Recolector: {selectedRecolector.name}");
         }
     }
 
-    // NUEVO: Asigna una planta enferma a un Purgador usando round-robin
+    // Asigna una planta enferma a un Purgador usando round-robin
     private void AssignPlantToPurgator(GameObject plant)
     {
         if (_availablePurgators.Count == 0)
         {
-            Debug.LogWarning("⚠️ No hay Purgadores disponibles para asignar planta");
+            Debug.LogWarning("No hay Purgadores disponibles para asignar planta");
             return;
         }
 
@@ -256,15 +261,16 @@ public class Manager : MonoBehaviour
         if (purgatorComp != null)
         {
             purgatorComp.AddPlantToTrack(plant);
-            Debug.Log($"→ Planta {plant.name} asignada a Purgador: {selectedPurgator.name}");
+            Debug.Log($"Planta {plant.name} asignada a Purgador: {selectedPurgator.name}");
         }
     }
 
     private bool PlantIsSick(Plant plant)
     {
-        if (plant.stemSickPercentage > _gameManager.plantMaxStemSickPercentage) return true;
-        if (plant.tomatoesSickPercentage > _gameManager.plantMaxTomatoesSickPercentage) return true;
-        if (plant.leavesSickPercentage > _gameManager.plantMaxLeavesSickPercentage) return true;
+        // Verificar si alguna parte de la planta está enferma
+        if (plant.plantIsSick) return true;
+        if (plant.tomatosAreSick) return true;
+        if (plant.leavesAreSick) return true;
         return false;
     }
 
