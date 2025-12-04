@@ -24,7 +24,8 @@ public class Explorer : MonoBehaviour
     private bool _reportSent = false;
     
     // Punto de inicio/base para volver después de explorar
-    public GameObject homePosition;
+    private Vector3 _homePosition;
+    private bool _returningHome = false;
 
     void Awake()
     {
@@ -54,6 +55,10 @@ public class Explorer : MonoBehaviour
             Debug.LogError("NavMeshAgent sigue siendo null después de Awake()!");
             return;
         }
+
+        // NUEVO: Guardar la posición inicial del Explorer para regresar después
+        _homePosition = transform.position;
+        Debug.Log($"🏠 Explorer guardó posición inicial: {_homePosition}");
 
         // NUEVO: No empezar automáticamente, esperar a que Manager llame StartExploration()
         Debug.Log("🤖 Explorer listo y esperando orden del Manager para comenzar exploración...");
@@ -160,7 +165,15 @@ public class Explorer : MonoBehaviour
         _hasArrived = true;
         _isMoving = false;
 
-        Debug.Log($"🎯 Explorer llegó a: {_currentTarget.name}");
+        Debug.Log($"🎯 Explorer llegó a: {(_currentTarget != null ? _currentTarget.name : "posición inicial")}");
+
+        // Si estaba regresando a casa, marcar como completo
+        if (_returningHome)
+        {
+            _returningHome = false;
+            Debug.Log("🏠 Explorer ha regresado a su posición inicial");
+            return;
+        }
 
         // Escanear en detalle en la ubicación actual
         ScanForPlants();
@@ -238,13 +251,44 @@ public class Explorer : MonoBehaviour
                 // NOTA: Las plantas ya fueron enviadas una por una durante la exploración
                 // No hay necesidad de enviar reporte batch aquí
                 
-                // Volver a la posición inicial si está definida
-                if (homePosition != null)
-                {
-                    _currentTarget = homePosition;
-                    NavigateToTarget(homePosition);
-                }
+                // NUEVO: Volver a la posición inicial
+                ReturnHome();
             }
+        }
+    }
+
+    // NUEVO: Método para regresar a la posición inicial
+    private void ReturnHome()
+    {
+        if (_navMeshAgent == null)
+        {
+            Debug.LogError("❌ NavMeshAgent es null, no se puede regresar a casa!");
+            return;
+        }
+
+        if (!_navMeshAgent.isOnNavMesh)
+        {
+            Debug.LogWarning("⚠️ El Explorer no está en el NavMesh, no puede regresar a casa!");
+            return;
+        }
+
+        Debug.Log($"🏠 Explorer regresando a posición inicial: {_homePosition}");
+        
+        _returningHome = true;
+        _currentTarget = null; // Limpiar el target actual
+        
+        bool pathSet = _navMeshAgent.SetDestination(_homePosition);
+        if (pathSet)
+        {
+            _hasArrived = false;
+            _isMoving = true;
+            Debug.Log("✅ Ruta hacia casa establecida correctamente");
+        }
+        else
+        {
+            Debug.LogWarning("⚠️ No se pudo establecer la ruta hacia la posición inicial");
+            _isMoving = false;
+            _returningHome = false;
         }
     }
 
@@ -351,9 +395,17 @@ public class Explorer : MonoBehaviour
         Plant plantComponent = target.GetComponent<Plant>();
         if (plantComponent != null)
         {
-            // Buscar el punto de acceso
-            Transform accessPoint = plantComponent.puntoDeAcceso;
-            destination = accessPoint != null ? accessPoint.position : target.transform.position;
+            // Buscar el punto de acceso o hijo "PuntoInteraccion"
+            Transform puntoInteraccion = target.transform.Find("PuntoInteraccion");
+            if (puntoInteraccion != null)
+            {
+                destination = puntoInteraccion.position;
+            }
+            else
+            {
+                Transform accessPoint = plantComponent.puntoDeAcceso;
+                destination = accessPoint != null ? accessPoint.position : target.transform.position;
+            }
         }
         else
         {
@@ -422,7 +474,9 @@ public class Explorer : MonoBehaviour
     {
         _explorationComplete = false;
         _reportSent = false;
+        _returningHome = false;
         _exploredPlants.Clear();
+        _homePosition = transform.position; // Actualizar posición inicial
         FindAllUnexploredPlants();
         if (_unexploredPlants.Count > 0)
         {
