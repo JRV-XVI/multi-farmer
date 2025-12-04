@@ -1187,8 +1187,8 @@ MonoBehaviour:
   recolectorMaxCarryWeight: 10
   purgatorDistanceToDeposit: 0.5
   purgatorMaxCarryWeight: 10
-  safeZoneMaxCarryWeight: 50
-  trashoneMaxCarryWeight: 50
+  safeZoneMaxCarryWeight: 1000000
+  trashoneMaxCarryWeight: 1000000
   plantMinWeight: 5
   plantMaxWeight: 20
   tomatoesMinWeight: 2

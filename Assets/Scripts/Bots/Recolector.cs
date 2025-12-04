@@ -273,27 +273,30 @@ public class Recolector : MonoBehaviour
     }
 
 
-    private void ColectPlant(GameObject plant)
+    private void ColectPlant(GameObject targetObject)
     {
-        Plant plantComponent = plant.GetComponent<Plant>();
+        // Si el targetObject es PuntoInteraccion, obtener el componente Plant del padre
+        GameObject plantObject = targetObject.GetComponent<Plant>() != null ? targetObject : targetObject.transform.parent.gameObject;
+        Plant plantComponent = plantObject.GetComponent<Plant>();
         
-        // Orientarse hacia la planta (como en RobotPrueba)
-        if (plantComponent != null && plantComponent.puntoDeAcceso != null)
+        if (plantComponent == null)
         {
-            transform.rotation = plantComponent.puntoDeAcceso.rotation;
+            Debug.LogError($"⚠️ No se encontró componente Plant en {plantObject.name}");
+            _trackList.Remove(targetObject);
+            TrackNextObject();
+            return;
         }
-        else
-        {
-            transform.LookAt(plant.transform);
-        }
+        
+        // Orientarse hacia el punto de interacción
+        transform.LookAt(targetObject.transform);
 
         // Recolectar la planta
-        float tomatosPlantWeight =plant.GetComponent<Plant>().ColectPlant();
+        float tomatosPlantWeight = plantComponent.ColectPlant();
         _currentCarryWeight += tomatosPlantWeight;
         
-        _trackList.Remove(plant);
+        _trackList.Remove(targetObject);
 
-        //Debug.Log($"🍅 Recolectado: {plant.name}. Peso actual: {_currentCarryWeight}");
+        //Debug.Log($"🍅 Recolectado: {plantObject.name}. Peso actual: {_currentCarryWeight}");
 
         TrackNextObject();
     }
@@ -326,8 +329,12 @@ public class Recolector : MonoBehaviour
     {
         if (plant != null && !_trackList.Contains(plant))
         {
-            _trackList.Add(plant);
-            Debug.Log($"📋 Recolector {gameObject.name} recibió planta: {plant.name}. Total en lista: {_trackList.Count}");
+            // Buscar el PuntoInteraccion en el plant
+            Transform puntoInteraccion = plant.transform.Find("PuntoInteraccion");
+            GameObject targetObject = (puntoInteraccion != null) ? puntoInteraccion.gameObject : plant;
+            
+            _trackList.Add(targetObject);
+            Debug.Log($"📋 Recolector {gameObject.name} recibió planta: {plant.name}, usando destino: {targetObject.name}. Total en lista: {_trackList.Count}");
             
             // NUEVO: Si el bot está idle (no moviéndose), iniciar movimiento inmediatamente
             if (!_isMoving && _currentTrack == null)
