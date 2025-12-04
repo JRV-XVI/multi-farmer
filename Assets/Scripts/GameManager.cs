@@ -1,99 +1,29 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
-    [Header("Recolectores")]
+    //Atributos de los recolectores
     public float recolectorDistanceToCollect = 0.5f;
     public float recolectorMaxCarryWeight = 10f;
 
-    [Header("Purgadores")]
+    //Atributos de los purgadores
     public float purgatorDistanceToDeposit = 0.5f;
     public float purgatorMaxCarryWeight = 10f;
 
-    [Header("Zones")]
+    //Atributos de las Zones
     public float safeZoneMaxCarryWeight = 50f;
     public float trashoneMaxCarryWeight = 50f;
 
-    [Header("Plantas en escena")]
-    public float plantMinWeight = 5f;
-    public float plantMaxWeight = 20f;
-    public float tomatoesMinWeight = 2f;
-    public float tomatoesMaxWeight = 5f;
-
-    [Header("Margen de enfermedad de planta")]
-    [Tooltip("Máximo porcentaje de enfermedad para considerar saludable (0.0 - 1.0)")]
-    public float plantMaxStemSickPercentage = 0.3f;
-    public float plantMaxTomatoesSickPercentage = 0.3f;
-    public float plantMaxLeavesSickPercentage = 0.3f;
-
-    [Tooltip("Probabilidad de enfermarse por cosecha (0.0 - 1.0)")]
-    public float plantStemSickChancePerHarvest = 0.1f;
-    public float plantTomatoesSickChancePerHarvest = 0.1f;
-    public float plantLeavesSickChancePerHarvest = 0.1f;
+    //Atributos de plantas en escena
+    public float plantWeightMin = 5f; //No asignada aun
+    public float tomatosWeightMin = 2f; //No asignada aun
 
     void Start()
     {
-        GameObject recolector = GameObject.FindWithTag("BotRecolector");
-        if(recolector == null)
-        {
-            Debug.LogError("Recolector not found in the scene!!");
-            return;
-        }
-
-        GameObject purgator = GameObject.FindWithTag("BotPurgator");
-        if(purgator == null)
-        {
-            Debug.LogError("Purgator not found in the scene!!");
-            return;
-        }
-
-        List<GameObject> plantsFound = FindPlantsInScene();
-        
-        if(plantsFound == null)
-        {
-            Debug.LogError("❌ FindPlantsInScene retornó null!");
-            plantsFound = new List<GameObject>();
-        }
-        
-        if(plantsFound.Count > 0)
-        {
-            Debug.Log($"🌱 Se encontraron {plantsFound.Count} plantas en la escena");
-            
-            // Validar el componente Recolector antes de llamar el método
-            Recolector recolectorComponent = recolector.GetComponent<Recolector>();
-            if(recolectorComponent == null)
-            {
-                Debug.LogError("❌ El GameObject BotRecolector no tiene el componente Recolector!");
-                return;
-            }
-            //recolectorComponent.InitializePlantList(plantsFound);
-            
-
-            Purgator purgatorComponent = purgator.GetComponent<Purgator>();
-            if(purgatorComponent == null)
-            {
-                Debug.LogError("❌ El GameObject BotPurgator no tiene el componente Purgator!");
-                return;
-            }
-            //purgatorComponent.InitializePlantList(plantsFound);
-
-        }
-        else
-        {
-            Debug.LogWarning("⚠️ No se encontraron plantas en la escena!");
-            // Inicializar con lista vacía para evitar null reference
-            Recolector recolectorComponent = recolector.GetComponent<Recolector>();
-            if(recolectorComponent != null)
-            {
-                recolectorComponent.InitializePlantList(new List<GameObject>());
-            }
-        }
-
-
-        /// Comenta esto cuando tengas el bot Explorador.
-        GameObject.FindGameObjectWithTag("BotManager").GetComponent<Manager>().AnalizePlants(plantsFound);
+        // El flujo ahora es: Explorer escanea -> reporta a Manager -> Manager asigna bots
+        Debug.Log("GameManager iniciado. Las plantas se inicializarán cuando el Explorer las escanee.");
     }
 
     // Update is called once per frame
@@ -102,7 +32,7 @@ public class GameManager : MonoBehaviour
         
     }
 
-    public List<GameObject> FindPlantsInScene()
+    List<GameObject> FindPlantsInScene()
     {
         GameObject[] plantsArray = GameObject.FindGameObjectsWithTag("Plant");
         
@@ -111,9 +41,8 @@ public class GameManager : MonoBehaviour
             Debug.LogWarning("⚠️ No se encontraron GameObjects con tag 'Plant'");
             
             // Buscar alternativamente por componente Plant
-            Plant[] plantComponents = FindObjectsByType<Plant>(FindObjectsSortMode.None);
-            
-            if (plantComponents != null && plantComponents.Length > 0)
+            Plant[] plantComponents = FindObjectsOfType<Plant>();
+            if(plantComponents != null && plantComponents.Length > 0)
             {
                 Debug.Log($"🔍 Se encontraron {plantComponents.Length} objetos con componente Plant");
                 return FilterValidPlants(plantComponents);
@@ -266,35 +195,40 @@ public class GameManager : MonoBehaviour
     }
 
 
-
-
-
-    //Esto es lo unico que se mantendra del GameManager original
     public void StartPlantValuesRandomly(Plant plant)
     {
-        //Asigancion de valroes de forma random
-        plant.plantWeight = Random.Range(plantMinWeight, plantMaxWeight);
-        plant.tomatosWeight = Random.Range(tomatoesMinWeight, tomatoesMaxWeight);
+        // Generar peso aleatorio de la planta y tomates
+        plant.plantWeight = Random.Range(plantWeightMin, plantWeightMin + 15f);
+        plant.tomatosWeight = Random.Range(tomatosWeightMin, tomatosWeightMin + 3f);
 
-        //Valoeres de enfermedad
-        if (Random.Range(0f, 1f) < plantStemSickChancePerHarvest)
-            plant.stemSickPercentage = Random.Range(plantMaxStemSickPercentage, 1f);
+        // 30% de probabilidad de que la planta esté enferma
+        // Si random >= 0.7, la planta está enferma (30% probabilidad)
+        // Si random < 0.7, la planta está sana (70% probabilidad)
+        float randomValue = Random.Range(0f, 1f);
+        
+        if (randomValue >= 0.7f)
+        {
+            // Planta enferma: al menos una parte está enferma
+            plant.plantIsSick = Random.Range(0f, 1f) > 0.5f;
+            plant.tomatosAreSick = Random.Range(0f, 1f) > 0.5f;
+            plant.leavesAreSick = Random.Range(0f, 1f) > 0.5f;
+            
+            // Asegurar que al menos una parte esté enferma
+            if (!plant.plantIsSick && !plant.tomatosAreSick && !plant.leavesAreSick)
+            {
+                int randomPart = Random.Range(0, 3);
+                if (randomPart == 0) plant.plantIsSick = true;
+                else if (randomPart == 1) plant.tomatosAreSick = true;
+                else plant.leavesAreSick = true;
+            }
+        }
         else
-            plant.stemSickPercentage = Random.Range(0f, plantMaxStemSickPercentage);
-
-        if (Random.Range(0f, 1f) < plantTomatoesSickChancePerHarvest)
-            plant.tomatoesSickPercentage = Random.Range(plantMaxTomatoesSickPercentage, 1f);
-        else
-            plant.tomatoesSickPercentage = Random.Range(0f, plantMaxTomatoesSickPercentage);
-
-        if (Random.Range(0f, 1f) < plantLeavesSickChancePerHarvest)
-            plant.leavesSickPercentage = Random.Range(plantMaxLeavesSickPercentage, 1f);
-        else
-            plant.leavesSickPercentage = Random.Range(0f, plantMaxLeavesSickPercentage);
-
-
-
-        //Y tambien falta asignar la imagen
+        {
+            // Planta sana
+            plant.plantIsSick = false;
+            plant.tomatosAreSick = false;
+            plant.leavesAreSick = false;
+        }
     }
 
 }
