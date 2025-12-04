@@ -84,7 +84,7 @@ public class Recolector : MonoBehaviour
     // Método mejorado basado en RobotPrueba para detectar llegada
     private void CheckNavigationStatus()
     {
-        if (_currentTrack != null && _navMeshAgent != null && _isMoving)
+        if (_navMeshAgent != null && _isMoving)
         {
             // Detectar si ya llegó al destino (lógica de RobotPrueba)
             if (!_navMeshAgent.pathPending && _navMeshAgent.remainingDistance <= _navMeshAgent.stoppingDistance)
@@ -105,7 +105,14 @@ public class Recolector : MonoBehaviour
         _hasArrived = true;
         _isMoving = false;
 
-        if (_currentTrack != null && _currentTrack.CompareTag("SafeZoneInteract"))
+        // Si _currentTrack es null, significa que estamos retornando a home
+        if (_currentTrack == null)
+        {
+            Debug.Log("🏡 Recolector llegó a su posición inicial (idle)");
+            return; // Quedarse idle en home
+        }
+
+        if (_currentTrack.CompareTag("SafeZoneInteract"))
         {
             DownloadWeight();
         }
